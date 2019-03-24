@@ -13,6 +13,18 @@ namespace tuc
         return output;
     }
 
+    template <typename Output, typename Input, typename AcceptFunction>
+    Output filter(Input const& input, AcceptFunction function, size_t expected_size = -1)
+    {
+        if (expected_size == -1) {
+            expected_size = input.size();
+        }
+        Output output;
+        detail::reserve(output, expected_size);
+        std::copy_if(input.begin(), input.end(), std::back_inserter(output), function);
+        return output;
+    }
+
     namespace detail {
         template <typename NotVector> void reserve(NotVector&, size_t) {
             // By default, do nothing (not std::vector)
@@ -21,5 +33,4 @@ namespace tuc
             vector.reserve(new_capacity);
         }
     }
-
 }
