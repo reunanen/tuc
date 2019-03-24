@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="tests">
+      <UniqueIdentifier>{0ba9d93e-2b19-459c-a00d-2d49c8a1293a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tuc">
+      <UniqueIdentifier>{137900be-c8b6-408e-a404-335bb3853a17}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\tuc\functional.hpp">
+      <Filter>tuc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\test-functional.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

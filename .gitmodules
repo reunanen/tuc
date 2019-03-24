@@ -1,0 +1,3 @@
+[submodule "tests/picotest"]
+	path = tests/picotest
+	url = https://github.com/reunanen/picotest
