@@ -16,10 +16,12 @@ namespace {
         {
             std::transform(input.begin(), input.end(), std::back_inserter(desired_map_output), map_function);
             std::copy_if(input.begin(), input.end(), std::back_inserter(desired_filter_output), filter_function);
+            std::set_difference(input.begin(), input.end(), desired_filter_output.begin(), desired_filter_output.end(), std::back_inserter(desired_remove_if_output));
         }
 
         std::deque<int> desired_map_output;
         std::deque<int> desired_filter_output;
+        std::deque<int> desired_remove_if_output;
     };
 
     TEST_F(FunctionalTest, MapsVectorToVector) {
@@ -67,6 +69,23 @@ namespace {
         auto const output = tuc::filter<std::deque<int>>(input_as_deque, filter_function);
 
         EXPECT_EQ(output, desired_filter_output);
+    }
+
+    TEST_F(FunctionalTest, RemovesFromVector) {
+        std::vector<int> input_and_output(input.begin(), input.end());
+        std::vector<int> const desired_remove_if_output_as_vector(desired_remove_if_output.begin(), desired_remove_if_output.end());
+
+        tuc::remove_if(input_and_output, filter_function);
+
+        EXPECT_EQ(input_and_output, desired_remove_if_output_as_vector);
+    }
+
+    TEST_F(FunctionalTest, RemovesFromDeque) {
+        std::deque<int> input_and_output(input.begin(), input.end());
+
+        tuc::remove_if(input_and_output, filter_function);
+
+        EXPECT_EQ(input_and_output, desired_remove_if_output);
     }
 
 }  // namespace

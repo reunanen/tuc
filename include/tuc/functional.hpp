@@ -25,6 +25,19 @@ namespace tuc
         return output;
     }
 
+    template <typename InputAndOutput, typename AcceptFunction>
+    void remove_if(InputAndOutput & input_and_output, AcceptFunction function)
+    {
+        input_and_output.erase(
+            std::remove_if(
+                input_and_output.begin(),
+                input_and_output.end(),
+                function
+            ),
+            input_and_output.end()
+        );
+    }
+
     namespace detail {
         template <typename NotVector> void reserve(NotVector&, size_t) {
             // By default, do nothing (not std::vector)
