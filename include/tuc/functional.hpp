@@ -26,7 +26,7 @@ namespace tuc
     }
 
     template <typename InputAndOutput, typename AcceptFunction>
-    void remove_if(InputAndOutput & input_and_output, AcceptFunction function)
+    void remove_if(InputAndOutput& input_and_output, AcceptFunction function)
     {
         input_and_output.erase(
             std::remove_if(
@@ -36,6 +36,30 @@ namespace tuc
             ),
             input_and_output.end()
         );
+    }
+
+    template <typename InputAndOutput, typename ToValue>
+    void sort_ascending(InputAndOutput& input_and_output, ToValue to_value)
+    {
+        auto const compare = [to_value](auto const& lhs, auto const& rhs) {
+            return to_value(lhs) < to_value(rhs);
+        };
+
+        std::sort(input_and_output.begin(), input_and_output.end(), compare);
+    }
+
+    template <typename InputAndOutput, typename ToValue>
+    InputAndOutput sort_ascending(InputAndOutput const& input, ToValue to_value)
+    {
+        auto const compare = [to_value](auto const& lhs, auto const& rhs) {
+            return to_value(lhs) < to_value(rhs);
+        };
+
+        auto output = input;
+
+        std::sort(output.begin(), output.end(), compare);
+
+        return output;
     }
 
     namespace detail {

@@ -88,4 +88,42 @@ namespace {
         EXPECT_EQ(input_and_output, desired_remove_if_output);
     }
 
+    TEST_F(FunctionalTest, SortsAscending) {
+        typedef std::tuple<int, int, int> SortTestItem;
+
+        std::vector<SortTestItem> data = {
+            { 0, 3, 8 }, { 1, 2, -1 }, { 3, 1, 5 }, { 2, 4, -2 }
+        };
+
+        std::vector<SortTestItem> const data_sorted_by_index_0 = {
+            { 0, 3, 8 }, { 1, 2, -1 }, { 2, 4, -2 }, { 3, 1, 5 }
+        };
+
+        std::vector<SortTestItem> const data_sorted_by_index_1 = {
+            { 3, 1, 5 }, { 1, 2, -1 }, { 0, 3, 8 }, { 2, 4, -2 }
+        };
+
+        std::vector<SortTestItem> const data_sorted_by_index_2 = {
+            { 2, 4, -2 }, { 1, 2, -1 }, { 3, 1, 5 }, { 0, 3, 8 },
+        };
+
+        tuc::sort_ascending(data, [](SortTestItem const& item) { return std::get<0>(item); });
+
+        EXPECT_EQ(data, data_sorted_by_index_0);
+
+        tuc::sort_ascending(data, [](SortTestItem const& item) { return std::get<1>(item); });
+
+        EXPECT_EQ(data, data_sorted_by_index_1);
+
+        tuc::sort_ascending(data, [](SortTestItem const& item) { return std::get<2>(item); });
+
+        EXPECT_EQ(data, data_sorted_by_index_2);
+
+        auto const const_data = data;
+
+        auto const copy_sorted_by_index_1 = tuc::sort_ascending(const_data, [](SortTestItem const& item) { return std::get<1>(item); });
+
+        EXPECT_EQ(copy_sorted_by_index_1, data_sorted_by_index_1);
+    }
+
 }  // namespace
