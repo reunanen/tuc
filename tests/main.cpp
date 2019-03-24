@@ -2,7 +2,7 @@ struct IUnknown; // Workaround for "combaseapi.h(229): error C2187: syntax error
 
 #include "picotest/picotest.h"
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
     RUN_ALL_TESTS();
 }
