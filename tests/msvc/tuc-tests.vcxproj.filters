@@ -15,6 +15,9 @@
     <ClInclude Include="..\..\include\tuc\string.hpp">
       <Filter>tuc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\tuc\numeric.hpp">
+      <Filter>tuc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test-functional.cpp">
@@ -24,6 +27,9 @@
       <Filter>tests</Filter>
     </ClCompile>
     <ClCompile Include="..\test-string.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test-numeric.cpp">
       <Filter>tests</Filter>
     </ClCompile>
   </ItemGroup>
