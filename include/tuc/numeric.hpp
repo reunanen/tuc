@@ -13,11 +13,21 @@ namespace tuc
             : 1 + ((numerator - 1) / denominator);
     }
 
-    // Trivial, but provided for completeness
+    template <typename T>
+    T divide_rounding_to_closest(T numerator, T denominator)
+    {
+        static_assert(std::is_integral<T>::value, "Integral type required");
+        return (numerator < 0) ^ (denominator < 0)
+            ? (numerator - denominator / 2) / denominator
+            : (numerator + denominator / 2) / denominator;
+    }
+
     template <typename T>
     T divide_rounding_down(T numerator, T denominator)
     {
         static_assert(std::is_integral<T>::value, "Integral type required");
-        return numerator / denominator;
+        return (numerator < 0) ^ (denominator < 0)
+            ? (numerator - denominator + 1) / denominator
+            : numerator / denominator;
     }
 }
