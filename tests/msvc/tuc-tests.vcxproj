@@ -144,12 +144,14 @@
     <ClInclude Include="..\..\include\tuc\functional.hpp" />
     <ClInclude Include="..\..\include\tuc\numeric.hpp" />
     <ClInclude Include="..\..\include\tuc\string.hpp" />
+    <ClInclude Include="..\..\include\tuc\to_string.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\test-functional.cpp" />
     <ClCompile Include="..\test-numeric.cpp" />
     <ClCompile Include="..\test-string.cpp" />
+    <ClCompile Include="..\test-to_string.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
