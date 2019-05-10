@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\tuc\functional.hpp" />
     <ClInclude Include="..\..\include\tuc\numeric.hpp" />
+    <ClInclude Include="..\..\include\tuc\openmp.hpp" />
     <ClInclude Include="..\..\include\tuc\string.hpp" />
     <ClInclude Include="..\..\include\tuc\to_string.hpp" />
   </ItemGroup>
@@ -150,6 +151,16 @@
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\test-functional.cpp" />
     <ClCompile Include="..\test-numeric.cpp" />
+    <ClCompile Include="..\test-openmp.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</OpenMPSupport>
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</OpenMPSupport>
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</OpenMPSupport>
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</OpenMPSupport>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\test-string.cpp" />
     <ClCompile Include="..\test-to_string.cpp" />
   </ItemGroup>
