@@ -24,6 +24,9 @@
     <ClInclude Include="..\..\include\tuc\openmp.hpp">
       <Filter>tuc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\tuc\from_string.hpp">
+      <Filter>tuc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test-functional.cpp">
@@ -42,6 +45,9 @@
       <Filter>tests</Filter>
     </ClCompile>
     <ClCompile Include="..\test-openmp.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test-from_string.cpp">
       <Filter>tests</Filter>
     </ClCompile>
   </ItemGroup>

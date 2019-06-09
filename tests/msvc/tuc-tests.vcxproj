@@ -141,6 +141,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\tuc\from_string.hpp" />
     <ClInclude Include="..\..\include\tuc\functional.hpp" />
     <ClInclude Include="..\..\include\tuc\numeric.hpp" />
     <ClInclude Include="..\..\include\tuc\openmp.hpp" />
@@ -149,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\test-from_string.cpp" />
     <ClCompile Include="..\test-functional.cpp" />
     <ClCompile Include="..\test-numeric.cpp" />
     <ClCompile Include="..\test-openmp.cpp">
