@@ -54,7 +54,7 @@ namespace {
         bool caught = false;
 
         try {
-            tuc::openmp::maybe_parallelize_for_loop(thrower, loops, true);
+            tuc::openmp::parallelize_for_loop(thrower, loops);
         }
         catch (std::exception&) {
             caught = true;

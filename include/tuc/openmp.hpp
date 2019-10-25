@@ -34,5 +34,11 @@ namespace tuc
                 }
             }
         }
+
+        template <typename Function>
+        void parallelize_for_loop(Function function, int loops)
+        {
+            maybe_parallelize_for_loop(function, loops, true);
+        }
     }
 }
