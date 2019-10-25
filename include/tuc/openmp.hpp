@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory> // scoped_ptr
+#include <string>
+
 namespace tuc
 { 
     namespace openmp
@@ -8,10 +11,21 @@ namespace tuc
         void maybe_parallelize_for_loop(Function function, int loops, bool parallelize)
         {
             if (parallelize) {
-                // TODO: add some sort of exception handling
+                std::unique_ptr<std::string> error;
 #pragma omp parallel for
                 for (int i = 0; i < loops; ++i) {
-                    function(i);
+                    try {
+                        function(i);
+                    }
+                    catch (std::exception& e) {
+#pragma omp critical
+                        if (!error) {
+                            error = std::make_unique<std::string>(e.what());
+                        }
+                    }
+                }
+                if (error) {
+                    throw std::runtime_error(*error);
                 }
             }
             else {
