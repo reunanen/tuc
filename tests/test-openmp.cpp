@@ -45,4 +45,22 @@ namespace {
 
         EXPECT_EQ(result, expected_sequential_result()); // The contents should match
     }
+
+    TEST_F(OpenMpTest, HandlesExceptions) {
+        const auto thrower = [](int) {
+            throw std::runtime_error("Error");
+        };
+
+        bool caught = false;
+
+        try {
+            tuc::openmp::maybe_parallelize_for_loop(thrower, loops, true);
+        }
+        catch (std::exception&) {
+            caught = true;
+        }
+
+        EXPECT_TRUE(caught);
+    }
+
 }  // namespace
