@@ -35,8 +35,8 @@ namespace {
         result.clear();
         tuc::openmp::maybe_parallelize_for_loop(push_i, loops, true);
         
-        EXPECT_EQ(result.size(), loops); // The size should match
-        EXPECT_NE(result, expected_sequential_result());     // The contents should not match, because of the sleeps
+        EXPECT_EQ(static_cast<int>(result.size()), loops); // The size should match
+        EXPECT_NE(result, expected_sequential_result());   // The contents should not match, because of the sleeps
     }
 
     TEST_F(OpenMpTest, RunsSequentially) {
