@@ -30,6 +30,7 @@ namespace {
         EXPECT_EQ("10", tuc::to_string(10.0001, 2, 0));
         EXPECT_EQ("0.000123", tuc::to_string(0.0001234, 3));
         EXPECT_EQ("0.000123", tuc::to_string(0.0001226, 3));
+        EXPECT_EQ("-0.000123", tuc::to_string(-0.0001226, 3));
     }
 
     TEST_F(ToStringTest, FormatsPercentagesNicely) {

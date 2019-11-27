@@ -10,7 +10,7 @@ namespace tuc
     std::string to_string(T number, int precision, int min_precision = 1)
     {
         static_assert(std::is_floating_point<T>::value, "Floating-point type required"); // doesn't really make a lot of sense for other types
-        int const actual_precision = std::max(precision + static_cast<int>(ceil(log10(1.0 / detail::round(number, precision))) - 1), min_precision);
+        int const actual_precision = std::max(precision + static_cast<int>(ceil(log10(1.0 / std::abs(detail::round(number, precision)))) - 1), min_precision);
         std::ostringstream oss;
         oss << std::fixed << std::setprecision(actual_precision) << number;
         return oss.str();
