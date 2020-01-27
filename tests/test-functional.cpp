@@ -126,4 +126,16 @@ namespace {
         EXPECT_EQ(copy_sorted_by_index_1, data_sorted_by_index_1);
     }
 
+    TEST_F(FunctionalTest, FindsMinMaxElement) {
+        std::vector<int> const values { 3, 2, 1 };
+        auto const identity = [](auto value) { return value; };
+        auto const min_element = tuc::min_element(values, identity);
+        auto const max_element = tuc::max_element(values, identity);
+        auto const minmax_element = tuc::minmax_element(values, identity);
+        EXPECT_EQ(*min_element, 1);
+        EXPECT_EQ(*max_element, 3);
+        EXPECT_EQ(*minmax_element.first, 1);
+        EXPECT_EQ(*minmax_element.second, 3);
+    }
+
 }  // namespace

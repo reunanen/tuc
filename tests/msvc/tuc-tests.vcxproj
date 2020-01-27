@@ -143,10 +143,12 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\tuc\from_string.hpp" />
     <ClInclude Include="..\..\include\tuc\functional.hpp" />
+    <ClInclude Include="..\..\include\tuc\functional_detail.hpp" />
     <ClInclude Include="..\..\include\tuc\numeric.hpp" />
     <ClInclude Include="..\..\include\tuc\openmp.hpp" />
     <ClInclude Include="..\..\include\tuc\string.hpp" />
     <ClInclude Include="..\..\include\tuc\to_string.hpp" />
+    <ClInclude Include="..\..\include\tuc\to_string_detail.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />

@@ -42,24 +42,34 @@ namespace tuc
     template <typename InputAndOutput, typename ToValue>
     void sort_ascending(InputAndOutput& input_and_output, ToValue to_value)
     {
-        auto const compare = [to_value](auto const& lhs, auto const& rhs) {
-            return to_value(lhs) < to_value(rhs);
-        };
-
-        std::sort(input_and_output.begin(), input_and_output.end(), compare);
+        std::sort(input_and_output.begin(), input_and_output.end(), detail::get_compare_function(to_value));
     }
 
     template <typename InputAndOutput, typename ToValue>
     InputAndOutput sort_ascending(InputAndOutput const& input, ToValue to_value)
     {
-        auto const compare = [to_value](auto const& lhs, auto const& rhs) {
-            return to_value(lhs) < to_value(rhs);
-        };
-
         auto output = input;
 
-        std::sort(output.begin(), output.end(), compare);
+        std::sort(output.begin(), output.end(), detail::get_compare_function(to_value));
 
         return output;
+    }
+
+    template <typename Input, typename ToValue>
+    auto min_element(Input const& input, ToValue to_value)
+    {
+        return std::min_element(input.begin(), input.end(), detail::get_compare_function(to_value));
+    }
+
+    template <typename Input, typename ToValue>
+    auto max_element(Input const& input, ToValue to_value)
+    {
+        return std::max_element(input.begin(), input.end(), detail::get_compare_function(to_value));
+    }
+
+    template <typename Input, typename ToValue>
+    auto minmax_element(Input const& input, ToValue to_value)
+    {
+        return std::minmax_element(input.begin(), input.end(), detail::get_compare_function(to_value));
     }
 }

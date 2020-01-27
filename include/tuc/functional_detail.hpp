@@ -11,5 +11,11 @@ namespace tuc
         template <typename VectorElement> void reserve(std::vector<VectorElement>& vector, size_t new_capacity) {
             vector.reserve(new_capacity);
         }
+
+        template <typename ToValue> auto get_compare_function(ToValue to_value) {
+            return [to_value](const auto& lhs, const auto& rhs) {
+                return to_value(lhs) < to_value(rhs);
+            };
+        }
     }
 }

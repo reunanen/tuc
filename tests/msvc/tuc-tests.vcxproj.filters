@@ -7,6 +7,9 @@
     <Filter Include="tuc">
       <UniqueIdentifier>{137900be-c8b6-408e-a404-335bb3853a17}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tuc\detail">
+      <UniqueIdentifier>{f7fc5eeb-493a-44ef-9174-6c5969fc66b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\tuc\functional.hpp">
@@ -26,6 +29,12 @@
     </ClInclude>
     <ClInclude Include="..\..\include\tuc\from_string.hpp">
       <Filter>tuc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\tuc\functional_detail.hpp">
+      <Filter>tuc\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\tuc\to_string_detail.hpp">
+      <Filter>tuc\detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
