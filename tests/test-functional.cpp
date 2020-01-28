@@ -126,6 +126,30 @@ namespace {
         EXPECT_EQ(copy_sorted_by_index_1, data_sorted_by_index_1);
     }
 
+    TEST_F(FunctionalTest, SortsDescending) {
+        typedef std::tuple<int, int, int> SortTestItem;
+
+        std::vector<SortTestItem> data = {
+            { 0, 3, 8 }, { 1, 2, -1 }, { 3, 1, 5 }, { 2, 4, -2 }
+        };
+
+        std::vector<SortTestItem> const data_sorted_by_index_1 = {
+            { 2, 4, -2 }, { 0, 3, 8 }, { 1, 2, -1 }, { 3, 1, 5 }
+        };
+
+        tuc::sort_descending(data, [](SortTestItem const& item) { return std::get<1>(item); });
+
+        EXPECT_EQ(data, data_sorted_by_index_1);
+
+        std::random_shuffle(data.begin(), data.end());
+
+        auto const const_data = data;
+
+        auto const copy_sorted_by_index_1 = tuc::sort_descending(const_data, [](SortTestItem const& item) { return std::get<1>(item); });
+
+        EXPECT_EQ(copy_sorted_by_index_1, data_sorted_by_index_1);
+    }
+
     TEST_F(FunctionalTest, FindsMinMaxElement) {
         std::vector<int> const values { 3, 2, 1 };
         auto const identity = [](auto value) { return value; };

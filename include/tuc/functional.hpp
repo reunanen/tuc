@@ -55,6 +55,22 @@ namespace tuc
         return output;
     }
 
+    template <typename InputAndOutput, typename ToValue>
+    void sort_descending(InputAndOutput& input_and_output, ToValue to_value)
+    {
+        std::sort(input_and_output.rbegin(), input_and_output.rend(), detail::get_compare_function(to_value));
+    }
+
+    template <typename InputAndOutput, typename ToValue>
+    InputAndOutput sort_descending(InputAndOutput const& input, ToValue to_value)
+    {
+        auto output = input;
+
+        std::sort(output.rbegin(), output.rend(), detail::get_compare_function(to_value));
+
+        return output;
+    }
+
     template <typename Input, typename ToValue>
     auto min_element(Input const& input, ToValue to_value)
     {
