@@ -37,7 +37,8 @@ namespace tuc
         }
 
         template <typename String>
-        bool equal_case_insensitive(String const& lhs, String const& rhs) {
+        bool equal_case_insensitive(String const& lhs, String const& rhs)
+        {
             if (lhs.size() != rhs.size()) {
                 return false;
             }
