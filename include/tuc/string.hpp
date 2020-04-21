@@ -17,7 +17,7 @@ namespace tuc
         String right(String const& input, size_t n)
         {
             auto const length = input.length();
-            return input.substr(length - std::min(length, n));
+            return input.substr(length - (std::min)(length, n));
         }
 
         template <typename String>
