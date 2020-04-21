@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <cctype> // std::tolower
 
 namespace tuc
 { 
@@ -34,6 +35,17 @@ namespace tuc
             return candidate_length <= input.length()
                 && candidate == right(input, candidate_length);
         }
+
+        template <typename String>
+        bool equal_case_insensitive(String const& lhs, String const& rhs) {
+            if (lhs.size() != rhs.size()) {
+                return false;
+            }
+            const auto equal = [](auto const& c1, auto const& c2) {
+                return c1 == c2 || std::tolower(c1) == std::tolower(c2);
+            };
+            return std::equal(lhs.begin(), lhs.end(), rhs.begin(), equal);
+        }
     }
 
     // Convenience wrappers for std::string
@@ -58,6 +70,11 @@ namespace tuc
         {
             return generic_string::ends_with(input, candidate);
         }
+
+        bool equal_case_insensitive(std::string const& lhs, std::string const& rhs)
+        {
+            return generic_string::equal_case_insensitive(lhs, rhs);
+        }
     }
 
     // Convenience wrappers for std::wstring
@@ -81,6 +98,11 @@ namespace tuc
         bool ends_with(std::wstring const& input, std::wstring const& candidate)
         {
             return generic_string::ends_with(input, candidate);
+        }
+
+        bool equal_case_insensitive(std::wstring const& lhs, std::wstring const& rhs)
+        {
+            return generic_string::equal_case_insensitive(lhs, rhs);
         }
     }
 }
