@@ -13,7 +13,7 @@ namespace tuc
             {
                 return 0.0;
             }
-            double const factor = std::pow(10.0, std::max(0.0, min_significant_digits - std::ceil(std::log10(std::abs(value)))));
+            double const factor = std::pow(10.0, (std::max)(0.0, min_significant_digits - std::ceil(std::log10(std::abs(value)))));
             return std::round(value * factor) / factor;
         }
     }
