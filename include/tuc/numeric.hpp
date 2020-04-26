@@ -30,4 +30,9 @@ namespace tuc
             ? (numerator - denominator + 1) / denominator
             : numerator / denominator;
     }
+
+    template <typename T>
+    T lerp(T const& v0, T const& v1, double t) {
+        return (1.0 - t) * v0 + t * v1;
+    }
 }

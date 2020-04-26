@@ -30,4 +30,12 @@ namespace {
         EXPECT_EQ(0, tuc::divide_rounding_down(0, 2));
     }
 
+    TEST_F(NumericTest, InterpolatesLinearly) {
+        EXPECT_EQ(tuc::lerp(2.0, 5.0, 0.0), 2.0);
+        EXPECT_EQ(tuc::lerp(2.0, 5.0, 1.0), 5.0);
+        EXPECT_EQ(tuc::lerp(2.0, 5.0, 0.5), 3.5);
+        EXPECT_EQ(tuc::lerp(2.0, 5.0, -1.0), -1.0);
+        EXPECT_EQ(tuc::lerp(2.0, 5.0, 2.0), 8.0);
+    }
+
 }  // namespace
