@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <assert.h>
 
 namespace tuc
 { 
@@ -34,5 +35,35 @@ namespace tuc
     template <typename T>
     T lerp(T const& v0, T const& v1, double t) {
         return (1.0 - t) * v0 + t * v1;
+    }
+
+    // Provide a simple clamp function that can be used with pre-C++17 compilers
+    template <typename T>
+    T clamp(T const& value, T const& low_limit, T const& high_limit) {
+        assert(low_limit <= high_limit);
+        return std::max(low_limit, std::min(high_limit, value));
+    }
+
+    template <typename T>
+    T smoothstep(T const& left_edge, T const& right_edge, T const& v) {
+        T const x = smoothstep_detail::prepare(left_edge, right_edge, v);
+        return x * x * (3 - 2 * x);
+    }
+
+    template <typename T>
+    T smootherstep(T const& left_edge, T const& right_edge, T const& v) {
+        T const x = smoothstep_detail::prepare(left_edge, right_edge, v);
+        return x * x * x * (x * (x * 6 - 15) + 10);
+    }
+
+    namespace smoothstep_detail {
+        template <typename T>
+        T prepare(T const& left_edge, T const& right_edge, T const& v) {
+            assert(right_edge > left_edge);
+            return tuc::clamp<T>(
+                (v - left_edge) / (right_edge - left_edge),
+                0, 1
+            );
+        }
     }
 }
