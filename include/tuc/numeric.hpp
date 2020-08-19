@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <algorithm> // std::min, std::max
 #include <assert.h>
 
 namespace tuc
@@ -44,6 +45,17 @@ namespace tuc
         return std::max(low_limit, std::min(high_limit, value));
     }
 
+    namespace smoothstep_detail {
+        template <typename T>
+        T prepare(T const& left_edge, T const& right_edge, T const& v) {
+            assert(right_edge > left_edge);
+            return tuc::clamp<T>(
+                (v - left_edge) / (right_edge - left_edge),
+                0, 1
+            );
+        }
+    }
+
     template <typename T>
     T smoothstep(T const& left_edge, T const& right_edge, T const& v) {
         T const x = smoothstep_detail::prepare(left_edge, right_edge, v);
@@ -54,16 +66,5 @@ namespace tuc
     T smootherstep(T const& left_edge, T const& right_edge, T const& v) {
         T const x = smoothstep_detail::prepare(left_edge, right_edge, v);
         return x * x * x * (x * (x * 6 - 15) + 10);
-    }
-
-    namespace smoothstep_detail {
-        template <typename T>
-        T prepare(T const& left_edge, T const& right_edge, T const& v) {
-            assert(right_edge > left_edge);
-            return tuc::clamp<T>(
-                (v - left_edge) / (right_edge - left_edge),
-                0, 1
-            );
-        }
     }
 }
