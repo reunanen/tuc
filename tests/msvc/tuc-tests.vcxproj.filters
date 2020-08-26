@@ -36,6 +36,9 @@
     <ClInclude Include="..\..\include\tuc\to_string_detail.hpp">
       <Filter>tuc\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\tuc\raii.hpp">
+      <Filter>tuc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test-functional.cpp">
@@ -57,6 +60,9 @@
       <Filter>tests</Filter>
     </ClCompile>
     <ClCompile Include="..\test-from_string.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test-raii.cpp">
       <Filter>tests</Filter>
     </ClCompile>
   </ItemGroup>

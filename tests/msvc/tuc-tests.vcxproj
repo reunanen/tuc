@@ -146,6 +146,7 @@
     <ClInclude Include="..\..\include\tuc\functional_detail.hpp" />
     <ClInclude Include="..\..\include\tuc\numeric.hpp" />
     <ClInclude Include="..\..\include\tuc\openmp.hpp" />
+    <ClInclude Include="..\..\include\tuc\raii.hpp" />
     <ClInclude Include="..\..\include\tuc\string.hpp" />
     <ClInclude Include="..\..\include\tuc\to_string.hpp" />
     <ClInclude Include="..\..\include\tuc\to_string_detail.hpp" />
@@ -164,6 +165,12 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\test-raii.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="..\test-string.cpp" />
     <ClCompile Include="..\test-to_string.cpp" />
