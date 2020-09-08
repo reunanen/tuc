@@ -38,4 +38,15 @@ namespace {
         EXPECT_EQ(tuc::lerp(2.0, 5.0, 2.0), 8.0);
     }
 
+    TEST(NumericTest, DeterminesSign) {
+        EXPECT_EQ(tuc::sign(2), 1);
+        EXPECT_EQ(tuc::sign(1), 1);
+        EXPECT_EQ(tuc::sign(0), 0);
+        EXPECT_EQ(tuc::sign(-2), -1);
+        EXPECT_EQ(tuc::sign(2.0), 1);
+        EXPECT_EQ(tuc::sign(0.1), 1);
+        EXPECT_EQ(tuc::sign(0.0), 0);
+        EXPECT_EQ(tuc::sign(-2.0), -1);
+    }
+
 }  // namespace

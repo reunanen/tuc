@@ -67,4 +67,11 @@ namespace tuc
         T const x = smoothstep_detail::prepare(left_edge, right_edge, v);
         return x * x * x * (x * (x * 6 - 15) + 10);
     }
+
+    template <typename T>
+    int sign(T const& value) {
+        T constexpr zero(0);
+        // idea taken from https://stackoverflow.com/a/4609795/19254
+        return (zero < value) - (value < zero);
+    }
 }
