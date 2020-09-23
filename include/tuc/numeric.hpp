@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <algorithm> // std::min, std::max
 #include <assert.h>
+#include <numeric>
 
 namespace tuc
 { 
@@ -74,4 +75,31 @@ namespace tuc
         // idea taken from https://stackoverflow.com/a/4609795/19254
         return (zero < value) - (value < zero);
     }
+
+    template <typename Iterator, typename T = double>
+    T arithmetic_mean(Iterator begin, Iterator end) {
+        return std::accumulate(begin, end, static_cast<T>(0)) / std::distance(begin, end);
+    }
+
+    template <typename Iterator, typename T = double>
+    T geometric_mean(Iterator begin, Iterator end) {
+        return std::pow(std::accumulate(begin, end, static_cast<T>(1), std::multiplies<T>()), 1.0 / std::distance(begin, end));
+    }
+
+    template <typename Iterator, typename T = double, typename P = double>
+    T power_mean(Iterator begin, Iterator end, P p) {
+        if (p == 0) {
+            return tuc::geometric_mean(begin, end);
+        }
+
+        auto const accumulate = [p](T a, T b) {
+            return a + pow(b, p);
+        };
+        auto const result = std::pow(std::accumulate(begin, end, static_cast<T>(0), accumulate) / std::distance(begin, end), 1.0 / p);
+        if (std::isinf(result)) {
+            return *std::max_element(begin, end);
+        }
+        return result;
+    }
+
 }

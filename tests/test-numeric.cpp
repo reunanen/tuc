@@ -49,4 +49,22 @@ namespace {
         EXPECT_EQ(tuc::sign(-2.0), -1);
     }
 
+    TEST(NumericTest, CalculatesMeans) {
+        std::vector<double> const numbers = { 1.0, 3.0, 9.0 };
+        EXPECT_NEAR(tuc::arithmetic_mean(numbers.begin(), numbers.end()), 4.333333, 1e-6);
+        EXPECT_EQ(tuc::geometric_mean(numbers.begin(), numbers.end()), 3.0);
+        EXPECT_NEAR(tuc::power_mean(numbers.begin(), numbers.end(), std::numeric_limits<double>::lowest()), *std::min_element(numbers.begin(), numbers.end()), 1e-20);
+        EXPECT_NEAR(tuc::power_mean(numbers.begin(), numbers.end(), -1), 2.0769231, 1e-6); // harmonic mean
+        EXPECT_NEAR(tuc::power_mean(numbers.begin(), numbers.end(), 0), tuc::geometric_mean(numbers.begin(), numbers.end()), 1e-20);
+        EXPECT_NEAR(tuc::power_mean(numbers.begin(), numbers.end(), 1), tuc::arithmetic_mean(numbers.begin(), numbers.end()), 1e-20);
+        EXPECT_NEAR(tuc::power_mean(numbers.begin(), numbers.end(), 2), 5.50757, 1e-5);
+        EXPECT_NEAR(tuc::power_mean(numbers.begin(), numbers.end(), 300), 8.9671, 1e-4);
+        EXPECT_EQ(tuc::power_mean(numbers.begin(), numbers.end(), std::numeric_limits<double>::max()), *std::max_element(numbers.begin(), numbers.end()));
+
+        for (int p10 = -3000; p10 < 3000; ++p10) {
+            double const p = p10 / 10.0;
+            EXPECT_LT(tuc::power_mean(numbers.begin(), numbers.end(), p), tuc::power_mean(numbers.begin(), numbers.end(), p + 1));
+        }
+    }
+
 }  // namespace
