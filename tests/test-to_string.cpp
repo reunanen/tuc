@@ -31,6 +31,13 @@ namespace {
         EXPECT_EQ("0.000123", tuc::to_string(0.0001234, 3));
         EXPECT_EQ("0.000123", tuc::to_string(0.0001226, 3));
         EXPECT_EQ("-0.000123", tuc::to_string(-0.0001226, 3));
+        EXPECT_EQ("12345678.9", tuc::to_string(12345678.9, 1));
+        EXPECT_EQ("12345678.9", tuc::to_string(12345678.9, 0));
+        EXPECT_EQ("12345679", tuc::to_string(12345678.9, 0, 0));
+        EXPECT_EQ("12345679", tuc::to_string(12345678.9, 2, 0));
+        EXPECT_EQ("12345678.9", tuc::to_string(12345678.9, 2, 1));
+        EXPECT_EQ("12345678.90", tuc::to_string(12345678.9, 2, 2));
+        EXPECT_EQ("12345678.90000", tuc::to_string(12345678.9, 2, 5));
     }
 
     TEST_F(ToStringTest, FormatsPercentagesNicely) {
