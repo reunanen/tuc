@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <memory>
+#include <functional>
 #include "functional_detail.hpp"
 
 namespace tuc
@@ -88,4 +90,48 @@ namespace tuc
     {
         return std::minmax_element(input.begin(), input.end(), detail::get_compare_function(to_value));
     }
+
+    template <typename Result>
+    class lazy_evaluator
+    {
+    public:
+        lazy_evaluator(std::function<Result()> function)
+            : function(function)
+        {}
+
+        const Result& get_result() const {
+            if (!result) {
+                result = std::make_unique<Result>(function());
+            }
+            return *result;
+        }
+
+    private:
+        const std::function<Result()> function;
+        mutable std::unique_ptr<Result> result;
+    };
+
+    template <typename T>
+    class maybe_apply_function_without_unnecessary_copy_pattern
+    {
+    public:
+        maybe_apply_function_without_unnecessary_copy_pattern(const T& input, std::function<T(const T&)> function, bool apply)
+            : input(input)
+            , function_result(
+                apply
+                    ? std::make_unique<T>(function(input))
+                    : std::unique_ptr<T>()
+            )
+        {}
+
+        const T& get() const {
+            return function_result
+                ? *function_result
+                : input;
+        }
+
+    private:
+        const T& input;
+        const std::unique_ptr<T> function_result;
+    };
 }

@@ -162,4 +162,62 @@ namespace {
         EXPECT_EQ(*minmax_element.second, 3);
     }
 
+    TEST_F(FunctionalTest, EvaluatesLazily) {
+        int counter = 0;
+        const auto function = [&]() {
+            return ++counter;
+        };
+        const tuc::lazy_evaluator<int> evaluator(function);
+        EXPECT_EQ(evaluator.get_result(), 1);
+        EXPECT_EQ(evaluator.get_result(), 1);
+        EXPECT_EQ(counter, 1);
+    }
+
+    TEST_F(FunctionalTest, AppliesFunctionWithoutUnnecessaryCopyingData) {
+        class Noncopyable {
+        public:
+            Noncopyable(int value)
+                : value(value)
+            {
+                assert(value != -1);
+            }
+            int get_value() const {
+                assert(value != -1);
+                return value;
+            }
+            Noncopyable(Noncopyable&& that) {
+                this->value = that.value;
+                that.value = -1;
+            }
+        private:
+            Noncopyable(const Noncopyable&); // non construction-copyable
+            Noncopyable& operator=(const Noncopyable&); // non copyable
+
+            int value = 0;
+        };
+
+        int evaluations = 0;
+
+        const auto timesTwo = [&evaluations](const Noncopyable& noncopyable) {
+            ++evaluations;
+            return std::move(Noncopyable(noncopyable.get_value() * 2));
+        };
+
+        const Noncopyable one(1);
+
+        typedef tuc::maybe_apply_function_without_unnecessary_copy_pattern<Noncopyable> pattern;
+
+        {
+            const pattern p(one, timesTwo, false);
+            EXPECT_EQ(p.get().get_value(), 1);
+            EXPECT_EQ(evaluations, 0);
+        }
+
+        {
+            const pattern p(one, timesTwo, true);
+            EXPECT_EQ(p.get().get_value(), 2);
+            EXPECT_EQ(evaluations, 1);
+        }
+    }
+
 }  // namespace
