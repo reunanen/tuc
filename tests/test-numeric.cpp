@@ -30,6 +30,31 @@ namespace {
         EXPECT_EQ(0, tuc::divide_rounding_down(0, 2));
     }
 
+    TEST_F(NumericTest, RoundsEasily) {
+        EXPECT_EQ(3, tuc::round(3.1));
+        EXPECT_EQ(3u, tuc::round<unsigned int>(3.1));
+    }
+
+    TEST_F(NumericTest, DetectsOverflow) {
+        try {
+            const auto rounded = tuc::round(1e20);
+            EXPECT_TRUE(false);
+        }
+        catch (std::exception& e) {
+            const std::string what = e.what();
+            EXPECT_NE(what.find("overflow"), std::string::npos);
+        }
+
+        try {
+            const auto rounded = tuc::round<unsigned int>(-5.0);
+            EXPECT_TRUE(false);
+        }
+        catch (std::exception& e) {
+            const std::string what = e.what();
+            EXPECT_NE(what.find("overflow"), std::string::npos);
+        }
+    }
+
     TEST_F(NumericTest, InterpolatesLinearly) {
         EXPECT_EQ(tuc::lerp(2.0, 5.0, 0.0), 2.0);
         EXPECT_EQ(tuc::lerp(2.0, 5.0, 1.0), 5.0);

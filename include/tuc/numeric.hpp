@@ -34,6 +34,17 @@ namespace tuc
             : numerator / denominator;
     }
 
+    // A convenience wrapper for combined rounding and typecasting
+    template <typename Output = int, typename Input>
+    Output round(Input input)
+    {
+        static_assert(std::is_integral<Output>::value, "Integral output type required - use std::round for other purposes");
+        if (input < std::numeric_limits<Output>::lowest() || input > std::numeric_limits<Output>::max()) {
+            throw std::runtime_error("Numeric overflow in tuc::round (input = " + std::to_string(input) + ")");
+        }
+        return static_cast<Output>(std::round(input));
+    }
+
     template <typename T>
     T lerp(T const& v0, T const& v1, double t) {
         return (1.0 - t) * v0 + t * v1;
