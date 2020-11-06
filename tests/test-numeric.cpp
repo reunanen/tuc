@@ -35,24 +35,21 @@ namespace {
         EXPECT_EQ(3u, tuc::round<unsigned int>(3.1));
     }
 
-    TEST_F(NumericTest, DetectsOverflow) {
+    template <typename Output, typename Input>
+    void expect_overflow(Input input) {
         try {
-            const auto rounded = tuc::round(1e20);
+            const auto rounded = tuc::round<Output>(input);
             EXPECT_TRUE(false);
         }
         catch (std::exception& e) {
             const std::string what = e.what();
             EXPECT_NE(what.find("overflow"), std::string::npos);
         }
+    }
 
-        try {
-            const auto rounded = tuc::round<unsigned int>(-5.0);
-            EXPECT_TRUE(false);
-        }
-        catch (std::exception& e) {
-            const std::string what = e.what();
-            EXPECT_NE(what.find("overflow"), std::string::npos);
-        }
+    TEST_F(NumericTest, DetectsOverflow) {
+        expect_overflow<int>(1e20);
+        expect_overflow<unsigned int>(-5.0);
     }
 
     TEST_F(NumericTest, InterpolatesLinearly) {
