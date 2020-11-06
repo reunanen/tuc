@@ -40,7 +40,11 @@ namespace tuc
     {
         static_assert(std::is_integral<Output>::value, "Integral output type required - use std::round for other purposes");
         if (input < std::numeric_limits<Output>::lowest() || input > std::numeric_limits<Output>::max()) {
-            throw std::runtime_error("Numeric overflow in tuc::round (input = " + std::to_string(input) + ")");
+            throw std::runtime_error(
+                "Numeric overflow in tuc::round (input = " + std::to_string(input) + "," +
+                " valid range = [" + std::to_string(std::numeric_limits<Output>::lowest()) +
+                ", " + std::to_string(std::numeric_limits<Output>::max()) + "])"
+            );
         }
         return static_cast<Output>(std::round(input));
     }
