@@ -39,6 +39,9 @@
     <ClInclude Include="..\..\include\tuc\raii.hpp">
       <Filter>tuc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\tuc\filesystem.hpp">
+      <Filter>tuc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test-functional.cpp">
@@ -63,6 +66,9 @@
       <Filter>tests</Filter>
     </ClCompile>
     <ClCompile Include="..\test-raii.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test-filesystem.cpp">
       <Filter>tests</Filter>
     </ClCompile>
   </ItemGroup>
