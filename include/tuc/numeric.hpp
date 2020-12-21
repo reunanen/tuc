@@ -39,11 +39,11 @@ namespace tuc
     Output round(Input input)
     {
         static_assert(std::is_integral<Output>::value, "Integral output type required - use std::round for other purposes");
-        if (input < std::numeric_limits<Output>::lowest() || input > std::numeric_limits<Output>::max()) {
+        if (input < std::numeric_limits<Output>::lowest() || input > (std::numeric_limits<Output>::max)()) {
             throw std::runtime_error(
                 "Numeric overflow in tuc::round (input = " + std::to_string(input) + "," +
                 " valid range = [" + std::to_string(std::numeric_limits<Output>::lowest()) +
-                ", " + std::to_string(std::numeric_limits<Output>::max()) + "])"
+                ", " + std::to_string((std::numeric_limits<Output>::max)()) + "])"
             );
         }
         return static_cast<Output>(std::round(input));
@@ -58,7 +58,7 @@ namespace tuc
     template <typename T>
     T clamp(T const& value, T const& low_limit, T const& high_limit) {
         assert(low_limit <= high_limit);
-        return std::max(low_limit, std::min(high_limit, value));
+        return (std::max)(low_limit, (std::min)(high_limit, value));
     }
 
     namespace smoothstep_detail {
