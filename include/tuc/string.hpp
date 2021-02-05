@@ -53,27 +53,27 @@ namespace tuc
     // Convenience wrappers for std::string
     namespace string
     {
-        std::string left(std::string const& input, size_t n)
+        inline std::string left(std::string const& input, size_t n)
         {
             return generic_string::left(input, n);
         }
 
-        std::string right(std::string const& input, size_t n)
+        inline std::string right(std::string const& input, size_t n)
         {
             return generic_string::right(input, n);
         }
 
-        bool starts_with(std::string const& input, std::string const& candidate)
+        inline bool starts_with(std::string const& input, std::string const& candidate)
         {
             return generic_string::starts_with(input, candidate);
         }
 
-        bool ends_with(std::string const& input, std::string const& candidate)
+        inline bool ends_with(std::string const& input, std::string const& candidate)
         {
             return generic_string::ends_with(input, candidate);
         }
 
-        bool equal_case_insensitive(std::string const& lhs, std::string const& rhs)
+        inline bool equal_case_insensitive(std::string const& lhs, std::string const& rhs)
         {
             return generic_string::equal_case_insensitive(lhs, rhs);
         }
@@ -82,27 +82,27 @@ namespace tuc
     // Convenience wrappers for std::wstring
     namespace wstring
     {
-        std::wstring left(std::wstring const& input, size_t n)
+        inline std::wstring left(std::wstring const& input, size_t n)
         {
             return generic_string::left(input, n);
         }
 
-        std::wstring right(std::wstring const& input, size_t n)
+        inline std::wstring right(std::wstring const& input, size_t n)
         {
             return generic_string::right(input, n);
         }
 
-        bool starts_with(std::wstring const& input, std::wstring const& candidate)
+        inline bool starts_with(std::wstring const& input, std::wstring const& candidate)
         {
             return generic_string::starts_with(input, candidate);
         }
 
-        bool ends_with(std::wstring const& input, std::wstring const& candidate)
+        inline bool ends_with(std::wstring const& input, std::wstring const& candidate)
         {
             return generic_string::ends_with(input, candidate);
         }
 
-        bool equal_case_insensitive(std::wstring const& lhs, std::wstring const& rhs)
+        inline bool equal_case_insensitive(std::wstring const& lhs, std::wstring const& rhs)
         {
             return generic_string::equal_case_insensitive(lhs, rhs);
         }
