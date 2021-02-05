@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cctype> // std::tolower
+#include <algorithm>
 
 namespace tuc
 { 
