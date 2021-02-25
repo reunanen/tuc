@@ -48,6 +48,19 @@ namespace tuc
             };
             return std::equal(lhs.begin(), lhs.end(), rhs.begin(), equal);
         }
+
+        // adapted from here: https://stackoverflow.com/questions/3418231/replace-part-of-a-string-with-another-string
+        template <typename String>
+        size_t replace_all(String& in_out, String const& before, String const& after)
+        {
+            size_t start_pos = 0, counter = 0;
+            while ((start_pos = in_out.find(before, start_pos)) != std::string::npos) {
+                in_out.replace(start_pos, before.length(), after);
+                start_pos += after.length();
+                ++counter;
+            }
+            return counter;
+        }
     }
 
     // Convenience wrappers for std::string
@@ -77,6 +90,11 @@ namespace tuc
         {
             return generic_string::equal_case_insensitive(lhs, rhs);
         }
+
+        inline size_t replace_all(std::string& in_out, std::string const& before, std::string const& after)
+        {
+            return generic_string::replace_all(in_out, before, after);
+        }
     }
 
     // Convenience wrappers for std::wstring
@@ -105,6 +123,11 @@ namespace tuc
         inline bool equal_case_insensitive(std::wstring const& lhs, std::wstring const& rhs)
         {
             return generic_string::equal_case_insensitive(lhs, rhs);
+        }
+
+        inline size_t replace_all(std::wstring& in_out, std::wstring const& before, std::wstring const& after)
+        {
+            return generic_string::replace_all(in_out, before, after);
         }
     }
 }
