@@ -33,6 +33,15 @@ namespace {
     TEST_F(NumericTest, RoundsEasily) {
         EXPECT_EQ(3, tuc::round(3.1));
         EXPECT_EQ(3u, tuc::round<unsigned int>(3.1));
+        EXPECT_EQ(255, tuc::round<uint8_t>(255.1));
+        EXPECT_EQ(0, tuc::round<uint8_t>(-0.1));
+        try {
+            tuc::round<uint8_t>(255.5);
+            EXPECT_TRUE(false);
+        }
+        catch (std::exception&) {
+            ; // this is where we want to be
+        }
     }
 
     template <typename Output, typename Input>
