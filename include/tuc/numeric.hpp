@@ -2,8 +2,9 @@
 
 #include <type_traits>
 #include <algorithm> // std::min, std::max
-#include <assert.h>
 #include <numeric>
+#include <cmath>
+#include <assert.h>
 
 namespace tuc
 { 
