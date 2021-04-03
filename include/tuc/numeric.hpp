@@ -63,6 +63,54 @@ namespace tuc
         return (std::max)(low_limit, (std::min)(high_limit, value));
     }
 
+    template <typename T>
+    class unambiguous_clamp {
+    public:
+        unambiguous_clamp& low(T const& low_) {
+            this->low_limit = low_;
+#ifndef NDEBUG
+            assert(!low_limit_defined);
+            low_limit_defined = true;
+#endif // NDEBUG
+            return *this;
+        }
+
+        unambiguous_clamp& high(T const& high_) {
+            this->high_limit = high_;
+#ifndef NDEBUG
+            assert(!high_limit_defined);
+            high_limit_defined = true;
+#endif // NDEBUG
+            return *this;
+        }
+
+        unambiguous_clamp& value(T const& value_) {
+            v = value_;
+#ifndef NDEBUG
+            assert(!value_defined);
+            value_defined = true;
+#endif // NDEBUG
+            return *this;
+        }
+
+        operator T() const {
+            assert(low_limit_defined);
+            assert(high_limit_defined);
+            assert(value_defined);
+            return tuc::clamp(v, low_limit, high_limit);
+        }
+
+    private:
+        T v;
+        T low_limit;
+        T high_limit;
+#ifndef NDEBUG
+        bool value_defined = false;
+        bool low_limit_defined = false;
+        bool high_limit_defined = false;
+#endif // NDEBUG
+    };
+
     namespace smoothstep_detail {
         template <typename T>
         T prepare(T const& left_edge, T const& right_edge, T const& v) {

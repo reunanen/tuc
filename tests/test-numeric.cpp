@@ -98,4 +98,10 @@ namespace {
         }
     }
 
+    TEST(NumericTest, ProvidesUnambiguousClampFunctionality) {
+        EXPECT_EQ(tuc::unambiguous_clamp<int>().low(5).high(10).value(3), 5);
+        EXPECT_EQ(tuc::unambiguous_clamp<int>().low(5).high(10).value(12), 10);
+        EXPECT_EQ(tuc::unambiguous_clamp<int>().low(5).high(10).value(7), 7);
+    }
+
 }  // namespace
