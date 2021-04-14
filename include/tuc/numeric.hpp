@@ -5,6 +5,7 @@
 #include <numeric>
 #include <cmath>
 #include <assert.h>
+#include <string>
 
 namespace tuc
 { 
