@@ -130,6 +130,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -148,7 +149,9 @@
     <ClInclude Include="..\..\include\tuc\numeric.hpp" />
     <ClInclude Include="..\..\include\tuc\openmp.hpp" />
     <ClInclude Include="..\..\include\tuc\raii.hpp" />
+    <ClInclude Include="..\..\include\tuc\shared_queue.hpp" />
     <ClInclude Include="..\..\include\tuc\string.hpp" />
+    <ClInclude Include="..\..\include\tuc\thread_pool.hpp" />
     <ClInclude Include="..\..\include\tuc\to_string.hpp" />
     <ClInclude Include="..\..\include\tuc\to_string_detail.hpp" />
   </ItemGroup>
@@ -174,7 +177,9 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="..\test-shared_queue.cpp" />
     <ClCompile Include="..\test-string.cpp" />
+    <ClCompile Include="..\test-thread_pool.cpp" />
     <ClCompile Include="..\test-to_string.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
