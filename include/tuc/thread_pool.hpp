@@ -47,6 +47,22 @@ namespace tuc
             return future;
         };
 
+        template<typename Function, typename... Arguments>
+        auto operator()(std::launch const& launch_mode, Function function, Arguments... arguments)
+        {
+            return launch(launch_mode, *this, function, arguments...);
+        }
+
+        template<typename Function, typename... Arguments>
+        auto static launch(std::launch const& launch_mode, thread_pool& tp, Function function, Arguments... arguments)
+        {
+            switch (launch_mode) {
+            case std::launch::async: return tp(function, arguments...);
+            case std::launch::deferred: return std::async(std::launch::deferred, function, arguments...);
+            default: throw std::runtime_error("Function run() not implemented for launch mode: " + std::to_string(static_cast<int>(launch_mode)));
+            }
+        }
+
         size_t get_thread_index(std::thread::id const& thread_id) const
         {
             for (size_t i = 0, end = threads.size(); i < end; ++i ) {
@@ -78,4 +94,10 @@ namespace tuc
         shared_queue<incoming_task> incoming_tasks;
         std::deque<std::thread> threads;
     };
+
+    template<typename Function, typename... Arguments>
+    auto launch(std::launch const& launch_mode, thread_pool& tp, Function function, Arguments... arguments)
+    {
+        return thread_pool::launch(launch_mode, tp, function, arguments...);
+    }
 }

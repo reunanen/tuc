@@ -3,6 +3,7 @@ struct IUnknown; // Workaround for "combaseapi.h(229): error C2187: syntax error
 #include "../include/tuc/thread_pool.hpp"
 #include "picotest/picotest.h"
 #include <numeric> // std::accumulate
+#include <array>
 
 namespace {
 
@@ -11,11 +12,10 @@ namespace {
     };
 
     TEST_F(ThreadPoolTest, StartsAndStopsThreadPool) {
-        size_t const thread_pool_size{ 4 };
         auto const task_count{ 20 };
         std::atomic<size_t> counter{ 0 };
 
-        tuc::thread_pool tp(thread_pool_size);
+        tuc::thread_pool tp;
 
         std::deque<std::future<size_t>> results;
 
@@ -33,11 +33,10 @@ namespace {
     }
 
     TEST_F(ThreadPoolTest, ActuallyHandlesTasksInParallel) {
-        size_t const thread_pool_size{ 4 };
         auto const task_count{ 20 };
         auto const task_duration_ms{ 1000 };
 
-        tuc::thread_pool tp(thread_pool_size);
+        tuc::thread_pool tp;
 
         std::deque<std::future<void>> results;
 
@@ -64,10 +63,9 @@ namespace {
     }
 
     TEST_F(ThreadPoolTest, CorrectlyPropagatesExceptions) {
-        size_t const thread_pool_size{ 4 };
         int const task_count{ 20 };
 
-        tuc::thread_pool tp(thread_pool_size);
+        tuc::thread_pool tp;
 
         std::deque<std::future<void>> results;
 
@@ -140,6 +138,32 @@ namespace {
             EXPECT_GE(counter, task_count / (thread_pool_size + 1));
             EXPECT_LE(counter, task_count / (thread_pool_size - 1));
         }
+    }
+
+    TEST_F(ThreadPoolTest, SupportsDeferredExecution) {
+        constexpr auto flag_count = 4;
+        std::vector<std::atomic<bool>> flags(flag_count);
+
+        tuc::thread_pool tp;
+
+        std::array<std::future<void>, flag_count> results {
+            tp(         std::launch::deferred,     [&] { flags[0] = true; }),
+            tp(         std::launch::async,        [&] { flags[1] = true; }),
+            tuc::launch(std::launch::deferred, tp, [&] { flags[2] = true; }),
+            tuc::launch(std::launch::async,    tp, [&] { flags[3] = true; })
+        };
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+        EXPECT_FALSE(flags[0]);
+        EXPECT_TRUE (flags[1]);
+        EXPECT_FALSE(flags[2]);
+        EXPECT_TRUE (flags[3]);
+
+        results[0].get();
+        results[2].get();
+        EXPECT_TRUE(flags[0]);
+        EXPECT_TRUE(flags[2]);
     }
 
 }  // namespace
