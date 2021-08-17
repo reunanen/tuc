@@ -5,6 +5,7 @@
 #include <future>
 #include <memory>
 #include <sstream>
+#include <functional>
 
 namespace tuc
 { 
