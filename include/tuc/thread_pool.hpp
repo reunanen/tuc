@@ -82,6 +82,11 @@ namespace tuc
             return get_thread_index(std::this_thread::get_id());
         }
 
+        size_t get_thread_count() const
+        {
+            return threads.size();
+        }
+
     private:
         thread_pool(thread_pool const&) = delete; // not construction-copyable
         thread_pool& operator=(thread_pool const&) = delete; // not copyable
