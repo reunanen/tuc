@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <sstream>
 #include <iomanip>
 #include "to_string_detail.hpp"
