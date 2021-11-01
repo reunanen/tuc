@@ -3,16 +3,42 @@
 #include <vector>
 #include <memory>
 #include <functional>
+
+#if __cplusplus >= 201703L || (defined (_MSC_VER) && _HAS_CXX17)
+#define HAS_EXECUTION_POLICY 1
+#include <execution>
+#else // C++17
+#define HAS_EXECUTION_POLICY 0
+#endif // C++17
+
 #include "functional_detail.hpp"
 
 namespace tuc
 {    
-    template <typename Output, typename Input, typename MapFunction>
-    Output map(Input const& input, MapFunction function)
+    template <typename Output, typename Input, typename MapFunction
+#if HAS_EXECUTION_POLICY
+        , typename ExecutionPolicy = std::execution::parallel_unsequenced_policy
+#endif // HAS_EXECUTION_POLICY
+    >
+    Output map(
+        Input const& input, MapFunction function
+#if HAS_EXECUTION_POLICY
+        , ExecutionPolicy execution_policy = std::execution::par_unseq
+#endif // HAS_EXECUTION_POLICY
+    )
     {
-        Output output;
-        detail::reserve(output, input.size()); // Perhaps std::transform is smart enough that this is not really needed for performance.
-        std::transform(input.begin(), input.end(), std::back_inserter(output), function);
+        Output output(input.size());
+
+        std::transform(
+#if HAS_EXECUTION_POLICY
+            execution_policy,
+#endif // HAS_EXECUTION_POLICY
+            input.begin(),
+            input.end(),
+            output.begin(),
+            function
+        );
+        
         return output;
     }
 
