@@ -26,7 +26,7 @@ namespace {
             // Code here will be called immediately after each test (right before the destructor).
         }
 
-        shared_queue<std::string> buffer;
+        tuc::shared_queue<std::string> buffer;
     };
 
     TEST_F(SharedQueueTest, DoesNotPopIfNothingPushed) {
