@@ -17,9 +17,9 @@ namespace tuc
     }
 
     template <typename Output, typename Input, typename AcceptFunction>
-    Output filter(Input const& input, AcceptFunction function, size_t expected_size = -1)
+    Output filter(Input const& input, AcceptFunction function, size_t expected_size = std::numeric_limits<size_t>::max())
     {
-        if (expected_size == -1) {
+        if (expected_size == std::numeric_limits<size_t>::max()) {
             expected_size = input.size();
         }
         Output output;
