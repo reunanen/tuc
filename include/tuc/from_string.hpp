@@ -3,6 +3,10 @@
 #include <string>
 #include <limits>
 
+#ifndef WIN32
+#include <assert.h>
+#endif // WIN32
+
 namespace tuc
 { 
     template <typename T>
@@ -21,7 +25,11 @@ namespace tuc
         if constexpr (std::is_same<T, float>::value) {
             return std::stof(string);
         }
+#ifdef WIN32
         static_assert(false, "Unexpected type");
+#else // WIN32
+        assert(false); // Unexpected type
+#endif // WIN32
 #else
         return static_cast<T>(std::stod(string));
 #endif
