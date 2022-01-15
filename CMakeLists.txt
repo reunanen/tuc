@@ -17,5 +17,5 @@ file (GLOB test
 
 add_executable(tuc-tests ${test})
 
-target_compile_options(tuc-tests PRIVATE -Wall ${OpenMP_CXX_FLAGS})
+target_compile_options(tuc-tests PRIVATE -Wall -Wextra -Wpedantic -Werror ${OpenMP_CXX_FLAGS})
 target_link_libraries(tuc-tests PRIVATE stdc++fs pthread ${OpenMP_CXX_FLAGS})
