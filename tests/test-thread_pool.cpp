@@ -12,19 +12,19 @@ namespace {
     };
 
     TEST_F(ThreadPoolTest, StartsAndStopsThreadPool) {
-        auto const task_count{ 20 };
+        size_t const task_count{ 20 };
         std::atomic<size_t> counter{ 0 };
 
         tuc::thread_pool tp;
 
         std::deque<std::future<size_t>> results;
 
-        for (auto task = 0; task < task_count; ++task) {
+        for (size_t task = 0; task < task_count; ++task) {
             auto future = tp([&counter]() { return counter++; });
             results.push_back(std::move(future));
         }
 
-        for (auto task = 0; task < task_count; ++task) {
+        for (size_t task = 0; task < task_count; ++task) {
             auto const result = results[task].get();
             EXPECT_EQ(result, task);
         }
@@ -63,13 +63,13 @@ namespace {
     }
 
     TEST_F(ThreadPoolTest, CorrectlyPropagatesExceptions) {
-        int const task_count{ 20 };
+        size_t const task_count{ 20 };
 
         tuc::thread_pool tp;
 
         std::deque<std::future<void>> results;
 
-        for (int task = 0; task < task_count; ++task) {
+        for (size_t task = 0; task < task_count; ++task) {
             results.push_back(tp([task]() {
                 throw task;
             }));
@@ -77,11 +77,11 @@ namespace {
 
         size_t catch_counter = 0;
 
-        for (int task = 0; task < task_count; ++task) {
+        for (size_t task = 0; task < task_count; ++task) {
             try {
                 results[task].get();
             }
-            catch (int const exception) {
+            catch (size_t const exception) {
                 EXPECT_EQ(exception, task);
                 ++catch_counter;
             }
@@ -92,14 +92,14 @@ namespace {
 
     TEST_F(ThreadPoolTest, ProvidesThreadIndex) {
         size_t const thread_pool_size{ 4 };
-        int const task_count{ 100 };
+        size_t const task_count{ 100 };
 
         std::vector<std::atomic<size_t>> counters(thread_pool_size);
         tuc::thread_pool tp(thread_pool_size);
 
         std::deque<std::future<void>> results;
 
-        for (int task = 0; task < task_count; ++task) {
+        for (size_t task = 0; task < task_count; ++task) {
             results.push_back(tp([&]() {
                 ++counters[tp.get_this_thread_index()];
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));

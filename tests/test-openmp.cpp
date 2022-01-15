@@ -18,7 +18,7 @@ namespace {
 
     std::deque<int> result;
 
-    const void push_i(int i) {
+    void push_i(int i) {
         std::this_thread::sleep_for(std::chrono::milliseconds(loops - i));
         
         std::lock_guard<std::mutex> lock(mutex);

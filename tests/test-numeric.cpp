@@ -48,7 +48,10 @@ namespace {
     void expect_overflow(Input input) {
         try {
             const auto rounded = tuc::round<Output>(input);
-            EXPECT_TRUE(false);
+
+            // not reached
+            EXPECT_GT(rounded, input);
+            EXPECT_LT(rounded, input);
         }
         catch (std::exception& e) {
             const std::string what = e.what();

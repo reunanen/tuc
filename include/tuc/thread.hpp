@@ -33,6 +33,7 @@ namespace tuc
 
         thread& operator=(thread&& that) {
             t = std::move(that.t);
+            return *this;
         }
 
     private:

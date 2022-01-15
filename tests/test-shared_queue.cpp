@@ -122,16 +122,16 @@ namespace {
 
     TEST_F(SharedQueueTest, HandlesMultipleProducersAndConsumers) {
 
-        int const valuesToPush = 100;
-        int const consumerCount = 20;
-        int const producerCount = 10;
+        size_t const valuesToPush = 100;
+        size_t const consumerCount = 20;
+        size_t const producerCount = 10;
 
         std::vector<std::thread> consumers, producers;
 
         std::mutex mutex;
         std::map<std::string, size_t> consumedValueCounts;
 
-        for (int i = 0; i < consumerCount; ++i) {
+        for (size_t i = 0; i < consumerCount; ++i) {
             consumers.push_back(std::thread([&] {
                 std::string value;
                 while (buffer.pop_front(value, std::chrono::seconds(1))) {
@@ -141,9 +141,9 @@ namespace {
             }));
         }
 
-        for (int i = 0; i < producerCount; ++i) {
+        for (size_t i = 0; i < producerCount; ++i) {
             producers.push_back(std::thread([&] {
-                for (int i = 0; i < valuesToPush; ++i) {
+                for (size_t i = 0; i < valuesToPush; ++i) {
                     std::ostringstream number;
                     number << i;
                     buffer.push_back(number.str());
