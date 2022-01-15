@@ -9,7 +9,6 @@
 
 namespace tuc
 {
-    
     class thread {
     public:
         template <typename Function, typename... Arguments>
@@ -45,12 +44,9 @@ namespace tuc
 #ifdef WIN32
         SetThreadPriority(GetCurrentThread(), -15);
 #else // WIN32
-        int policy = 0;
         struct sched_param param = {};
-        const int self = pthread_self();
-        pthread_getschedparam(self, &policy, &param);
-        param.sched_priority = sched_get_priority_min(policy);
-        pthread_setschedparam(self, policy, &param);
+        param.sched_priority = 0;
+        pthread_setschedparam(pthread_self(), SCHED_IDLE, &param);
 #endif // WIN32
     }
 }
