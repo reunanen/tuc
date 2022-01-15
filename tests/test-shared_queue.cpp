@@ -53,7 +53,11 @@ namespace {
             std::string value;
             EXPECT_TRUE(buffer.pop_front(value, std::chrono::seconds(1)));
             EXPECT_EQ(value, "test");
-            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 10);
+#ifdef WIN32
+            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 20);
+#else // WIN32
+            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 120);
+#endif // WIN32
         } };
 
         std::thread producer{ [&] {
@@ -71,14 +75,22 @@ namespace {
             auto const t1 = std::chrono::steady_clock::now();
             std::string value;
             EXPECT_FALSE(buffer.pop_front(value, std::chrono::seconds(1)));
-            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t1).count(), 10);
+#ifdef WIN32
+            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t1).count(), 20);
+#else // WIN32
+            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t1).count(), 120);
+#endif // WIN32
         } };
 
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
         buffer.halt();
         consumer.join();
 
-        EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 20);
+#ifdef WIN32
+        EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 30);
+#else // WIN32
+        EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 150);
+#endif // WIN32
     }
 
     TEST_F(SharedQueueTest, ReturnsIfHaltedBeforehand) {

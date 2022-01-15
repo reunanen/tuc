@@ -20,7 +20,10 @@ namespace {
         std::deque<std::future<size_t>> results;
 
         for (size_t task = 0; task < task_count; ++task) {
-            auto future = tp([&counter]() { return counter++; });
+            auto future = tp([&counter](size_t task) {
+                ++counter;
+                return task;
+            }, task);
             results.push_back(std::move(future));
         }
 
@@ -57,9 +60,12 @@ namespace {
         }
 
         auto const t2 = std::chrono::steady_clock::now();
-        auto const d2 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+        auto const d2 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t0).count();
         EXPECT_GE(d2, task_duration_ms);
-        EXPECT_LT(d2, task_count * task_duration_ms / 2);
+        auto const hardware_concurrency = std::thread::hardware_concurrency();
+        if (hardware_concurrency > 2) {
+            EXPECT_LT(d2, task_count * task_duration_ms / 2);
+        }
     }
 
     TEST_F(ThreadPoolTest, CorrectlyPropagatesExceptions) {
@@ -135,8 +141,9 @@ namespace {
         for (auto const& counter : counters)
         {
             // Distribution across threads should be relatively uniform
-            EXPECT_GE(counter, task_count / (thread_pool_size + 1));
-            EXPECT_LE(counter, task_count / (thread_pool_size - 1));
+            size_t const counter_value = counter;
+            EXPECT_GE(counter_value, task_count / (thread_pool_size + 2));
+            EXPECT_LE(counter_value, task_count / (thread_pool_size - 1));
         }
     }
 
