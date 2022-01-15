@@ -11,10 +11,15 @@ namespace {
 
     };
 
+    TEST_F(ThreadTest, JoinsThreadAutomatically) {
+        tuc::thread t1([]() {});
+        tuc::thread t2(std::thread([]() {}));
+    }
+
     TEST_F(ThreadTest, SetsThreadPriority) {
         for (int actually_set_low_priority = 0; actually_set_low_priority <= 1; ++actually_set_low_priority) {
-            std::deque<std::thread> low_priority_threads;
-            std::deque<std::thread> normal_priority_threads;
+            std::deque<tuc::thread> low_priority_threads;
+            std::deque<tuc::thread> normal_priority_threads;
 
             std::atomic<uintmax_t> low_priority_counter = 0;
             std::atomic<uintmax_t> normal_priority_counter = 0;
@@ -30,15 +35,15 @@ namespace {
             const auto hardware_concurrency = std::thread::hardware_concurrency();
 
             for (unsigned int i = 0; i < hardware_concurrency; ++i) {
-                low_priority_threads.push_back(std::thread([&]() {
+                low_priority_threads.push_back([&]() {
                     if (actually_set_low_priority) {
                         tuc::set_current_thread_to_idle_priority();
                     }
                     increment_counter_multiple_times(low_priority_counter);
-                }));
-                normal_priority_threads.push_back(std::thread([&]() {
+                });
+                normal_priority_threads.push_back([&]() {
                     increment_counter_multiple_times(normal_priority_counter);
-                }));
+                });
             }
 
             const auto max_total_value = hardware_concurrency * max_value_per_thread;
@@ -53,13 +58,6 @@ namespace {
             }
             else {
                 EXPECT_GT(low_priority_value, max_total_value * 0.8);
-            }
-
-            for (auto& t : normal_priority_threads) {
-                t.join();
-            }
-            for (auto& t : low_priority_threads) {
-                t.join();
             }
         }
     }

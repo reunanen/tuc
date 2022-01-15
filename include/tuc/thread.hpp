@@ -8,7 +8,37 @@
 #endif
 
 namespace tuc
-{ 
+{
+    
+    class thread {
+    public:
+        template <typename Function, typename... Arguments>
+        thread(Function function, Arguments... arguments)
+            : t(function, arguments...)
+        {}
+
+        thread(tuc::thread&& thread)
+            : t(std::move(thread.t))
+        {}
+
+        thread(std::thread&& thread)
+            : t(std::move(thread))
+        {}
+
+        ~thread() {
+            if (t.joinable()) {
+                t.join();
+            }
+        }
+
+        thread& operator=(thread&& that) {
+            t = std::move(that.t);
+        }
+
+    private:
+        std::thread t;
+    };
+
     void set_current_thread_to_idle_priority()
     {
 #ifdef WIN32
