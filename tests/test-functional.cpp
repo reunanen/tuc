@@ -2,7 +2,9 @@ struct IUnknown; // Workaround for "combaseapi.h(229): error C2187: syntax error
 
 #include "../include/tuc/functional.hpp"
 #include "picotest/picotest.h"
+#include <iterator>
 #include <deque>
+#include <random>
 
 namespace {
 
@@ -141,7 +143,11 @@ namespace {
 
         EXPECT_EQ(data, data_sorted_by_index_1);
 
-        std::random_shuffle(data.begin(), data.end());
+        {
+            std::random_device random_device;
+            std::mt19937 generator(random_device());
+            std::shuffle(data.begin(), data.end(), generator);
+        }
 
         auto const const_data = data;
 
@@ -190,8 +196,8 @@ namespace {
                 that.value = -1;
             }
         private:
-            Noncopyable(const Noncopyable&); // non construction-copyable
-            Noncopyable& operator=(const Noncopyable&); // non copyable
+            Noncopyable(const Noncopyable&) = delete; // non construction-copyable
+            Noncopyable& operator=(const Noncopyable&) = delete; // non copyable
 
             int value = 0;
         };
