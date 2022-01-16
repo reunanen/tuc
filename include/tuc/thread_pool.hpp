@@ -46,7 +46,7 @@ namespace tuc
             auto future = task->get_future();
             incoming_tasks.push_back({ [task]() { (*task)(); } });
             return future;
-        };
+        }
 
         template<typename Function, typename... Arguments>
         auto operator()(std::launch const& launch_mode, Function function, Arguments... arguments)

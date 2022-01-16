@@ -26,7 +26,7 @@ namespace {
             // Code here will be called immediately after each test (right before the destructor).
         }
 
-        shared_queue<std::string> buffer;
+        tuc::shared_queue<std::string> buffer;
     };
 
     TEST_F(SharedQueueTest, DoesNotPopIfNothingPushed) {
@@ -53,7 +53,11 @@ namespace {
             std::string value;
             EXPECT_TRUE(buffer.pop_front(value, std::chrono::seconds(1)));
             EXPECT_EQ(value, "test");
-            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 10);
+#ifdef WIN32
+            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 20);
+#else // WIN32
+            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 120);
+#endif // WIN32
         } };
 
         std::thread producer{ [&] {
@@ -71,14 +75,22 @@ namespace {
             auto const t1 = std::chrono::steady_clock::now();
             std::string value;
             EXPECT_FALSE(buffer.pop_front(value, std::chrono::seconds(1)));
-            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t1).count(), 10);
+#ifdef WIN32
+            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t1).count(), 20);
+#else // WIN32
+            EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t1).count(), 120);
+#endif // WIN32
         } };
 
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
         buffer.halt();
         consumer.join();
 
-        EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 20);
+#ifdef WIN32
+        EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 30);
+#else // WIN32
+        EXPECT_LE(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count(), 150);
+#endif // WIN32
     }
 
     TEST_F(SharedQueueTest, ReturnsIfHaltedBeforehand) {
@@ -122,16 +134,16 @@ namespace {
 
     TEST_F(SharedQueueTest, HandlesMultipleProducersAndConsumers) {
 
-        int const valuesToPush = 100;
-        int const consumerCount = 20;
-        int const producerCount = 10;
+        size_t const valuesToPush = 100;
+        size_t const consumerCount = 20;
+        size_t const producerCount = 10;
 
         std::vector<std::thread> consumers, producers;
 
         std::mutex mutex;
         std::map<std::string, size_t> consumedValueCounts;
 
-        for (int i = 0; i < consumerCount; ++i) {
+        for (size_t i = 0; i < consumerCount; ++i) {
             consumers.push_back(std::thread([&] {
                 std::string value;
                 while (buffer.pop_front(value, std::chrono::seconds(1))) {
@@ -141,9 +153,9 @@ namespace {
             }));
         }
 
-        for (int i = 0; i < producerCount; ++i) {
+        for (size_t i = 0; i < producerCount; ++i) {
             producers.push_back(std::thread([&] {
-                for (int i = 0; i < valuesToPush; ++i) {
+                for (size_t i = 0; i < valuesToPush; ++i) {
                     std::ostringstream number;
                     number << i;
                     buffer.push_back(number.str());

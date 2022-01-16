@@ -12,19 +12,22 @@ namespace {
     };
 
     TEST_F(ThreadPoolTest, StartsAndStopsThreadPool) {
-        auto const task_count{ 20 };
+        size_t const task_count{ 20 };
         std::atomic<size_t> counter{ 0 };
 
         tuc::thread_pool tp;
 
         std::deque<std::future<size_t>> results;
 
-        for (auto task = 0; task < task_count; ++task) {
-            auto future = tp([&counter]() { return counter++; });
+        for (size_t task = 0; task < task_count; ++task) {
+            auto future = tp([&counter](size_t task) {
+                ++counter;
+                return task;
+            }, task);
             results.push_back(std::move(future));
         }
 
-        for (auto task = 0; task < task_count; ++task) {
+        for (size_t task = 0; task < task_count; ++task) {
             auto const result = results[task].get();
             EXPECT_EQ(result, task);
         }
@@ -57,19 +60,22 @@ namespace {
         }
 
         auto const t2 = std::chrono::steady_clock::now();
-        auto const d2 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+        auto const d2 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t0).count();
         EXPECT_GE(d2, task_duration_ms);
-        EXPECT_LT(d2, task_count * task_duration_ms / 2);
+        auto const hardware_concurrency = std::thread::hardware_concurrency();
+        if (hardware_concurrency > 2) {
+            EXPECT_LT(d2, task_count * task_duration_ms / 2);
+        }
     }
 
     TEST_F(ThreadPoolTest, CorrectlyPropagatesExceptions) {
-        int const task_count{ 20 };
+        size_t const task_count{ 20 };
 
         tuc::thread_pool tp;
 
         std::deque<std::future<void>> results;
 
-        for (int task = 0; task < task_count; ++task) {
+        for (size_t task = 0; task < task_count; ++task) {
             results.push_back(tp([task]() {
                 throw task;
             }));
@@ -77,11 +83,11 @@ namespace {
 
         size_t catch_counter = 0;
 
-        for (int task = 0; task < task_count; ++task) {
+        for (size_t task = 0; task < task_count; ++task) {
             try {
                 results[task].get();
             }
-            catch (int const exception) {
+            catch (size_t const exception) {
                 EXPECT_EQ(exception, task);
                 ++catch_counter;
             }
@@ -92,14 +98,14 @@ namespace {
 
     TEST_F(ThreadPoolTest, ProvidesThreadIndex) {
         size_t const thread_pool_size{ 4 };
-        int const task_count{ 100 };
+        size_t const task_count{ 100 };
 
         std::vector<std::atomic<size_t>> counters(thread_pool_size);
         tuc::thread_pool tp(thread_pool_size);
 
         std::deque<std::future<void>> results;
 
-        for (int task = 0; task < task_count; ++task) {
+        for (size_t task = 0; task < task_count; ++task) {
             results.push_back(tp([&]() {
                 ++counters[tp.get_this_thread_index()];
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -135,13 +141,14 @@ namespace {
         for (auto const& counter : counters)
         {
             // Distribution across threads should be relatively uniform
-            EXPECT_GE(counter, task_count / (thread_pool_size + 1));
-            EXPECT_LE(counter, task_count / (thread_pool_size - 1));
+            size_t const counter_value = counter;
+            EXPECT_GE(counter_value, task_count / (thread_pool_size + 2));
+            EXPECT_LE(counter_value, task_count / (thread_pool_size - 1));
         }
     }
 
     TEST_F(ThreadPoolTest, SupportsDeferredExecution) {
-        constexpr auto flag_count = 4;
+        auto constexpr flag_count = 4;
         std::vector<std::atomic<bool>> flags(flag_count);
 
         tuc::thread_pool tp;

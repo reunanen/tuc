@@ -48,6 +48,9 @@
     <ClInclude Include="..\..\include\tuc\shared_queue.hpp">
       <Filter>tuc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\tuc\thread.hpp">
+      <Filter>tuc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test-functional.cpp">
@@ -81,6 +84,9 @@
       <Filter>tests</Filter>
     </ClCompile>
     <ClCompile Include="..\test-shared_queue.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test-thread.cpp">
       <Filter>tests</Filter>
     </ClCompile>
   </ItemGroup>

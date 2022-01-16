@@ -43,9 +43,9 @@ namespace tuc
     }
 
     template <typename Output, typename Input, typename AcceptFunction>
-    Output filter(Input const& input, AcceptFunction function, size_t expected_size = -1)
+    Output filter(Input const& input, AcceptFunction function, size_t expected_size = std::numeric_limits<size_t>::max())
     {
-        if (expected_size == -1) {
+        if (expected_size == std::numeric_limits<size_t>::max()) {
             expected_size = input.size();
         }
         Output output;
@@ -125,7 +125,7 @@ namespace tuc
             : function(function)
         {}
 
-        const Result& get_result() const {
+        Result const& get_result() const {
             if (!result) {
                 result = std::make_unique<Result>(function());
             }
@@ -133,15 +133,15 @@ namespace tuc
         }
 
     private:
-        const std::function<Result()> function;
-        mutable std::unique_ptr<Result> result;
+        std::function<Result()> const function;
+        std::unique_ptr<Result> mutable result;
     };
 
     template <typename T>
     class maybe_apply_function_without_unnecessary_copy_pattern
     {
     public:
-        maybe_apply_function_without_unnecessary_copy_pattern(const T& input, std::function<T(const T&)> function, bool apply)
+        maybe_apply_function_without_unnecessary_copy_pattern(T const& input, std::function<T(T const&)> function, bool apply)
             : input(input)
             , function_result(
                 apply
@@ -150,14 +150,14 @@ namespace tuc
             )
         {}
 
-        const T& get() const {
+        T const& get() const {
             return function_result
                 ? *function_result
                 : input;
         }
 
     private:
-        const T& input;
-        const std::unique_ptr<T> function_result;
+        T const& input;
+        std::unique_ptr<T> const function_result;
     };
 }

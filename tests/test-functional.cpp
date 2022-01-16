@@ -2,7 +2,9 @@ struct IUnknown; // Workaround for "combaseapi.h(229): error C2187: syntax error
 
 #include "../include/tuc/functional.hpp"
 #include "picotest/picotest.h"
+#include <iterator>
 #include <deque>
+#include <random>
 
 namespace {
 
@@ -141,7 +143,11 @@ namespace {
 
         EXPECT_EQ(data, data_sorted_by_index_1);
 
-        std::random_shuffle(data.begin(), data.end());
+        {
+            std::random_device random_device;
+            std::mt19937 generator(random_device());
+            std::shuffle(data.begin(), data.end(), generator);
+        }
 
         auto const const_data = data;
 
@@ -164,10 +170,10 @@ namespace {
 
     TEST_F(FunctionalTest, EvaluatesLazily) {
         int counter = 0;
-        const auto function = [&]() {
+        auto const function = [&]() {
             return ++counter;
         };
-        const tuc::lazy_evaluator<int> evaluator(function);
+        tuc::lazy_evaluator<int> const evaluator(function);
         EXPECT_EQ(evaluator.get_result(), 1);
         EXPECT_EQ(evaluator.get_result(), 1);
         EXPECT_EQ(counter, 1);
@@ -190,31 +196,31 @@ namespace {
                 that.value = -1;
             }
         private:
-            Noncopyable(const Noncopyable&); // non construction-copyable
-            Noncopyable& operator=(const Noncopyable&); // non copyable
+            Noncopyable(Noncopyable const&) = delete; // non construction-copyable
+            Noncopyable& operator=(Noncopyable const&) = delete; // non copyable
 
             int value = 0;
         };
 
         int evaluations = 0;
 
-        const auto timesTwo = [&evaluations](const Noncopyable& noncopyable) {
+        auto const timesTwo = [&evaluations](Noncopyable const& noncopyable) {
             ++evaluations;
             return std::move(Noncopyable(noncopyable.get_value() * 2));
         };
 
-        const Noncopyable one(1);
+        Noncopyable const one(1);
 
         typedef tuc::maybe_apply_function_without_unnecessary_copy_pattern<Noncopyable> pattern;
 
         {
-            const pattern p(one, timesTwo, false);
+            pattern const p(one, timesTwo, false);
             EXPECT_EQ(p.get().get_value(), 1);
             EXPECT_EQ(evaluations, 0);
         }
 
         {
-            const pattern p(one, timesTwo, true);
+            pattern const p(one, timesTwo, true);
             EXPECT_EQ(p.get().get_value(), 2);
             EXPECT_EQ(evaluations, 1);
         }
