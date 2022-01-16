@@ -3,6 +3,8 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <algorithm>
+#include <iterator>
 #include "functional_detail.hpp"
 
 namespace tuc
