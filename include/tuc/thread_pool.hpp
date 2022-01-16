@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shared_queue.hpp"
+#include "thread.hpp" // set_current_thread_to_idle_priority()
 #include <atomic>
 #include <future>
 #include <memory>
@@ -8,13 +9,25 @@
 #include <functional>
 
 namespace tuc
-{ 
+{
+    enum struct thread_priority
+    {
+        idle_priority = -1,
+        normal_priority = 0
+    };
+
     class thread_pool
     {
     public:
-        thread_pool(size_t thread_count = std::thread::hardware_concurrency())
+        thread_pool(
+            size_t thread_count = std::thread::hardware_concurrency(),
+            thread_priority thread_priority = thread_priority::idle_priority
+        )
         {
-            auto function = [this]() {
+            auto function = [this, thread_priority]() {
+                if (thread_priority == thread_priority::idle_priority) {
+                    set_current_thread_to_idle_priority();
+                }
                 std::chrono::hours constexpr one_hour{ 1 };
                 while (!killed) {
                     incoming_task task;
