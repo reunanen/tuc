@@ -39,7 +39,7 @@ namespace tuc
         std::thread t;
     };
 
-    void set_current_thread_to_idle_priority()
+    void inline set_current_thread_to_idle_priority()
     {
 #ifdef WIN32
         SetThreadPriority(GetCurrentThread(), -15);
