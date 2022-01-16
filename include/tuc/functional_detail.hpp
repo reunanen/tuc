@@ -13,7 +13,7 @@ namespace tuc
         }
 
         template <typename ToValue> auto get_compare_function(ToValue to_value) {
-            return [to_value](const auto& lhs, const auto& rhs) {
+            return [to_value](auto const& lhs, auto const& rhs) {
                 return to_value(lhs) < to_value(rhs);
             };
         }

@@ -148,7 +148,7 @@ namespace {
     }
 
     TEST_F(ThreadPoolTest, SupportsDeferredExecution) {
-        constexpr auto flag_count = 4;
+        auto constexpr flag_count = 4;
         std::vector<std::atomic<bool>> flags(flag_count);
 
         tuc::thread_pool tp;

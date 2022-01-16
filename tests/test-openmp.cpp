@@ -12,7 +12,7 @@ namespace {
     class OpenMpTest : public ::testing::Test {
     };
 
-    constexpr int loops = 100;
+    int constexpr loops = 100;
 
     std::mutex mutex;
 
@@ -25,7 +25,7 @@ namespace {
         result.push_back(i);
     }
 
-    const std::deque<int> expected_sequential_result() {
+    std::deque<int> const expected_sequential_result() {
         std::deque<int> sequential_result(loops);
         std::iota(sequential_result.begin(), sequential_result.end(), 0);
         return sequential_result;
@@ -47,7 +47,7 @@ namespace {
     }
 
     TEST_F(OpenMpTest, HandlesExceptions) {
-        const auto thrower = [](int) {
+        auto const thrower = [](int) {
             throw std::runtime_error("Error");
         };
 

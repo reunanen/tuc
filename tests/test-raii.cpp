@@ -12,12 +12,12 @@ namespace {
     };
 
     TEST_F(ReleaseResourcesTest, ClosesAndRemovesFile) {
-        const char* filename = "test.txt";
+        char const* filename = "test.txt";
 
         // Let's open a file for writing, and then auto-close it
         {
             FILE* f = fopen(filename, "wb");
-            const auto release = [f, filename]() {
+            auto const release = [f, filename]() {
                 fclose(f);
                 std::remove(filename);
             };

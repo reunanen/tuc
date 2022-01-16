@@ -10,7 +10,7 @@
 namespace tuc
 { 
     template <typename T>
-    T from_string(const std::string& string)
+    T from_string(std::string const& string)
     {
         static_assert(std::is_floating_point<T>::value, "Floating-point type required"); // doesn't really make a lot of sense for other types
 
