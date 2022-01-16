@@ -47,11 +47,14 @@ namespace {
     template <typename Output, typename Input>
     void expect_overflow(Input input) {
         try {
-            const auto rounded = tuc::round<Output>(input);
-            EXPECT_TRUE(false);
+            auto const rounded = tuc::round<Output>(input);
+
+            // not reached
+            EXPECT_GT(rounded, input);
+            EXPECT_LT(rounded, input);
         }
         catch (std::exception& e) {
-            const std::string what = e.what();
+            std::string const what = e.what();
             EXPECT_NE(what.find("overflow"), std::string::npos);
         }
     }

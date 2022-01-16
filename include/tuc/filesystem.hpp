@@ -10,7 +10,7 @@ namespace tuc
 { 
     namespace fs = std::experimental::filesystem::v1;
 
-    inline void remove_empty_directories_recursively(const fs::path& path) {
+    inline void remove_empty_directories_recursively(fs::path const& path) {
         for (fs::directory_iterator i(path), end; i != end; ++i) {
             if (fs::is_directory(i->path())) {
                 remove_empty_directories_recursively(i->path());

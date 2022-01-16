@@ -43,7 +43,7 @@ namespace tuc
             if (lhs.size() != rhs.size()) {
                 return false;
             }
-            const auto equal = [](auto const& c1, auto const& c2) {
+            auto const equal = [](auto const& c1, auto const& c2) {
                 return c1 == c2 || std::tolower(c1) == std::tolower(c2);
             };
             return std::equal(lhs.begin(), lhs.end(), rhs.begin(), equal);

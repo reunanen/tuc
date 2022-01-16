@@ -1,0 +1,27 @@
+version: 2.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: "Update submodule"
+          command: git submodule update --init
+      - run:
+          name: "Build"
+          command: |
+            mkdir build
+            cd build
+            cmake ..
+            cmake --build .
+      - run:
+          name: "Test"
+          command: |
+            build/tuc-tests
+          
+workflows:
+  build-and-test:
+    jobs:
+      - build-and-test

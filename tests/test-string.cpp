@@ -32,8 +32,10 @@ namespace {
 
     TEST_F(StringTest, TellsIfEqualCaseInsensitive) {
         EXPECT_TRUE(tuc::wstring::equal_case_insensitive(L"abc", L"abC"));
-        EXPECT_FALSE(tuc::wstring::equal_case_insensitive(L"abc", L"äbC"));
         EXPECT_TRUE(tuc::string::equal_case_insensitive("abc", "abC"));
+#ifdef WIN32
+        EXPECT_FALSE(tuc::wstring::equal_case_insensitive(L"abc", L"äbC"));
         EXPECT_FALSE(tuc::string::equal_case_insensitive("abc", "äbC"));
+#endif // WIN32
     }
 }  // namespace
