@@ -1,0 +1,14 @@
+image: Visual Studio 2019
+init:
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+install:
+  - git submodule update --init
+build_script:
+  - msbuild tests\msvc\tuc-tests.sln /p:Platform=x64 /p:Configuration=Release
+  - msbuild tests\msvc\tuc-tests.sln /p:Platform=x64 /p:Configuration=Debug
+  - msbuild tests\msvc\tuc-tests.sln /p:Platform=x86 /p:Configuration=Release
+  - msbuild tests\msvc\tuc-tests.sln /p:Platform=x86 /p:Configuration=Debug
+  - tests\msvc\x64\Release\tuc-tests.exe
+  - tests\msvc\x64\Debug\tuc-tests.exe
+  - tests\msvc\Win32\Release\tuc-tests.exe
+  - tests\msvc\Win32\Debug\tuc-tests.exe
