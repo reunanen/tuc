@@ -6,6 +6,7 @@
 #include <cmath>
 #include <assert.h>
 #include <string>
+#include <stdexcept>
 
 namespace tuc
 { 
