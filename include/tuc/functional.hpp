@@ -4,7 +4,9 @@
 #include <memory>
 #include <functional>
 
-#if __cplusplus >= 201703L || (defined (_MSC_VER) && _HAS_CXX17)
+#if defined(__GNUC__) && __GNUC__ < 11
+#define HAS_EXECUTION_POLICY 0
+#elif __cplusplus >= 201703L || (defined (_MSC_VER) && _HAS_CXX17)
 #define HAS_EXECUTION_POLICY 1
 #include <execution>
 #else // C++17
