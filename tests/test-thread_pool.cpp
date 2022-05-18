@@ -195,6 +195,12 @@ namespace {
 
         EXPECT_LT(default_desired_chunk_size, tuc::divide_rounding_up(task_count, tp.get_thread_count()));
 
+        auto const min_default_desired_chunk_size = tp.get_default_desired_chunk_size(task_count, -std::numeric_limits<double>::infinity());
+        auto const max_default_desired_chunk_size = tp.get_default_desired_chunk_size(task_count,  std::numeric_limits<double>::infinity());
+
+        EXPECT_EQ(min_default_desired_chunk_size, static_cast<size_t>(1));
+        EXPECT_EQ(max_default_desired_chunk_size, tuc::divide_rounding_up(task_count, tp.get_thread_count()));
+
         for (size_t i = 0; i < task_count; ++i) {
             auto const reference = (i / default_desired_chunk_size) * default_desired_chunk_size;
             EXPECT_EQ(processing_thread_indexes[i], processing_thread_indexes[reference]);

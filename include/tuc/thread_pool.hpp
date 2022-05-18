@@ -4,6 +4,7 @@
 #include "thread.hpp" // set_current_thread_to_idle_priority()
 #include "numeric.hpp"
 #include <atomic>
+#include <array>
 #include <future>
 #include <memory>
 #include <sstream>
@@ -80,10 +81,19 @@ namespace tuc
             }
         }
 
-        size_t get_default_desired_chunk_size(size_t task_count) const
+        // expected task uniformity:
+        // * try negative infinity if you expect tasks to be highly non-uniform (-> small chunk size)
+        // * try positive infinity if you expect tasks to be highly uniform     (-> large chunk size)
+        // * try in-between values if you expect tasks to be moderately uniform (-> in-between chunk size)
+        size_t get_default_desired_chunk_size(size_t task_count, double expected_task_uniformity = 0.0) const
         {
+            auto const min_reasonable_chunk_size = 1;
             auto const max_reasonable_chunk_size = tuc::divide_rounding_up(task_count, get_thread_count());
-            return tuc::round<size_t>(std::sqrt(max_reasonable_chunk_size));
+            std::array<double, 2> const extremes = {
+                static_cast<double>(min_reasonable_chunk_size),
+                static_cast<double>(max_reasonable_chunk_size)
+            };
+            return tuc::round<size_t>(tuc::power_mean(extremes.begin(), extremes.end(), expected_task_uniformity));
         }
 
         template<typename Function, typename... Arguments>

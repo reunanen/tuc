@@ -158,7 +158,7 @@ namespace tuc
         if (p == 0) {
             return tuc::geometric_mean(begin, end);
         }
-
+        p = std::clamp(p, -std::numeric_limits<P>::max(), std::numeric_limits<P>::max()); // allow -inf and +inf as input
         auto const accumulate = [p](T a, T b) {
             return a + pow(b, p);
         };
