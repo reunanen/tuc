@@ -2,6 +2,7 @@
 
 #include "shared_queue.hpp"
 #include "thread.hpp" // set_current_thread_to_idle_priority()
+#include "numeric.hpp"
 #include <atomic>
 #include <future>
 #include <memory>
@@ -30,9 +31,11 @@ namespace tuc
                 }
                 std::chrono::hours constexpr one_hour{ 1 };
                 while (!killed) {
-                    incoming_task task;
-                    if (incoming_tasks.pop_front(task, one_hour)) {
-                        task.task();
+                    std::vector<incoming_task> tasks;
+                    if (incoming_tasks.pop_front(tasks, one_hour)) {
+                        for (auto& task : tasks) {
+                            task.task();
+                        }
                     }
                 }
             };
@@ -57,7 +60,7 @@ namespace tuc
             using packaged_task_type = std::packaged_task<decltype(function(arguments...))()>;
             auto task = std::make_shared<packaged_task_type>(std::bind(function, arguments...));
             auto future = task->get_future();
-            incoming_tasks.push_back({ [task]() { (*task)(); } });
+            incoming_tasks.push_back({ { [task]() { (*task)(); } } });
             return future;
         }
 
@@ -75,6 +78,56 @@ namespace tuc
             case std::launch::deferred: return std::async(std::launch::deferred, function, arguments...);
             default: throw std::runtime_error("Function run() not implemented for launch mode: " + std::to_string(static_cast<int>(launch_mode)));
             }
+        }
+
+        size_t get_default_desired_chunk_size(size_t task_count) const
+        {
+            auto const max_reasonable_chunk_size = tuc::divide_rounding_up(task_count, get_thread_count());
+            return tuc::round<size_t>(std::sqrt(max_reasonable_chunk_size));
+        }
+
+        template<typename Function, typename... Arguments>
+        auto launch_in_chunks(Function function, std::vector<Arguments...> const& arguments, size_t desired_chunk_size = 0)
+        {
+            std::vector<std::future<decltype(function(arguments.front()))>> futures(arguments.size());
+
+            size_t const chunk_size = desired_chunk_size == 0
+                ? get_default_desired_chunk_size(arguments.size())
+                : desired_chunk_size;
+
+            std::vector<incoming_task> current_chunk;
+            current_chunk.reserve(chunk_size);
+
+            auto const dispatch_current_chunk = [&]() {
+                incoming_tasks.push_back(std::move(current_chunk));
+                current_chunk.clear();
+            };
+
+            for (size_t i = 0, end = arguments.size(); i < end; ++i) {
+                auto const& argument = arguments[i];
+                using packaged_task_type = std::packaged_task<decltype(function(argument))()>;
+                auto task = std::make_shared<packaged_task_type>(std::bind(function, argument));
+                futures[i] = task->get_future();
+                current_chunk.push_back({ { [task]() { (*task)(); } } });
+                if (current_chunk.size() >= chunk_size) {
+                    dispatch_current_chunk();
+                }
+            }
+
+            if (!current_chunk.empty()) {
+                dispatch_current_chunk();
+            }
+
+            return futures;
+        }
+        
+        // A convenience wrapper for the above function
+        template<typename Function>
+        auto launch_in_chunks(Function function, size_t count, size_t desired_chunk_size = 0)
+        {
+            std::vector<size_t> arguments(count);
+            std::iota(arguments.begin(), arguments.end(), 0);
+            return launch_in_chunks(function, arguments, desired_chunk_size);
         }
 
         size_t get_thread_index(std::thread::id const& thread_id) const
@@ -110,7 +163,7 @@ namespace tuc
         };
 
         std::atomic<bool> killed = false;
-        shared_queue<incoming_task> incoming_tasks;
+        shared_queue<std::vector<incoming_task>> incoming_tasks;
         std::deque<std::thread> threads;
     };
 
