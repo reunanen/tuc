@@ -8,12 +8,12 @@
 #include <iterator>
 
 #if defined(__GNUC__) && __GNUC__ < 11
-#define HAS_EXECUTION_POLICY 0
+#define TUC_HAS_EXECUTION_POLICY 0
 #elif __cplusplus >= 201703L || (defined (_MSC_VER) && _HAS_CXX17)
-#define HAS_EXECUTION_POLICY 1
+#define TUC_HAS_EXECUTION_POLICY 1
 #include <execution>
 #else // C++17
-#define HAS_EXECUTION_POLICY 0
+#define TUC_HAS_EXECUTION_POLICY 0
 #endif // C++17
 
 #include "functional_detail.hpp"
@@ -29,7 +29,7 @@ namespace tuc
         return output;
     }
 
-#if HAS_EXECUTION_POLICY
+#if TUC_HAS_EXECUTION_POLICY
     template <typename Output, typename Input, typename MapFunction, typename ExecutionPolicy = std::execution::parallel_unsequenced_policy>
     Output map(ExecutionPolicy execution_policy, Input const& input, MapFunction function)
     {
@@ -45,7 +45,7 @@ namespace tuc
 
         return output;
     }
-#endif // HAS_EXECUTION_POLICY
+#endif // TUC_HAS_EXECUTION_POLICY
 
     template <typename Output, typename Input, typename AcceptFunction>
     Output filter(Input const& input, AcceptFunction function, size_t expected_size = (std::numeric_limits<size_t>::max)())
@@ -72,7 +72,7 @@ namespace tuc
         );
     }
 
-#if HAS_EXECUTION_POLICY
+#if TUC_HAS_EXECUTION_POLICY
     template <typename InputAndOutput, typename AcceptFunction, typename ExecutionPolicy = std::execution::parallel_unsequenced_policy>
     void remove_if(ExecutionPolicy execution_policy, InputAndOutput& input_and_output, AcceptFunction function)
     {
@@ -86,7 +86,7 @@ namespace tuc
             input_and_output.end()
         );
     }
-#endif // HAS_EXECUTION_POLICY
+#endif // TUC_HAS_EXECUTION_POLICY
 
     template <typename InputAndOutput, typename ToValue>
     void sort_ascending(InputAndOutput& input_and_output, ToValue to_value)
