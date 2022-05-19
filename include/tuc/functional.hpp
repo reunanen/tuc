@@ -20,24 +20,23 @@
 
 namespace tuc
 {    
-    template <typename Output, typename Input, typename MapFunction
+    template <typename Output, typename Input, typename MapFunction>
+    Output map(Input const& input, MapFunction function)
+    {
+        Output output;
+        detail::reserve(output, input.size()); // Perhaps std::transform is smart enough that this is not really needed for performance.
+        std::transform(input.begin(), input.end(), std::back_inserter(output), function);
+        return output;
+    }
+
 #if HAS_EXECUTION_POLICY
-        , typename ExecutionPolicy = std::execution::parallel_unsequenced_policy
-#endif // HAS_EXECUTION_POLICY
-    >
-    Output map(
-        Input const& input, MapFunction function
-#if HAS_EXECUTION_POLICY
-        , ExecutionPolicy execution_policy = std::execution::par_unseq
-#endif // HAS_EXECUTION_POLICY
-    )
+    template <typename Output, typename Input, typename MapFunction, typename ExecutionPolicy = std::execution::parallel_unsequenced_policy>
+    Output map(ExecutionPolicy execution_policy, Input const& input, MapFunction function)
     {
         Output output(input.size());
 
         std::transform(
-#if HAS_EXECUTION_POLICY
             execution_policy,
-#endif // HAS_EXECUTION_POLICY
             input.begin(),
             input.end(),
             output.begin(),
@@ -46,6 +45,7 @@ namespace tuc
 
         return output;
     }
+#endif // HAS_EXECUTION_POLICY
 
     template <typename Output, typename Input, typename AcceptFunction>
     Output filter(Input const& input, AcceptFunction function, size_t expected_size = (std::numeric_limits<size_t>::max)())
@@ -59,22 +59,11 @@ namespace tuc
         return output;
     }
 
-    template <typename InputAndOutput, typename AcceptFunction
-#if HAS_EXECUTION_POLICY
-        , typename ExecutionPolicy = std::execution::parallel_unsequenced_policy
-#endif // HAS_EXECUTION_POLICY
-    >
-    void remove_if(InputAndOutput& input_and_output, AcceptFunction function
-#if HAS_EXECUTION_POLICY
-        , ExecutionPolicy execution_policy = std::execution::par_unseq
-#endif // HAS_EXECUTION_POLICY
-    )
+    template <typename InputAndOutput, typename AcceptFunction>
+    void remove_if(InputAndOutput& input_and_output, AcceptFunction function)
     {
         input_and_output.erase(
             std::remove_if(
-#if HAS_EXECUTION_POLICY
-                execution_policy,
-#endif // HAS_EXECUTION_POLICY
                 input_and_output.begin(),
                 input_and_output.end(),
                 function
@@ -82,6 +71,22 @@ namespace tuc
             input_and_output.end()
         );
     }
+
+#if HAS_EXECUTION_POLICY
+    template <typename InputAndOutput, typename AcceptFunction, typename ExecutionPolicy = std::execution::parallel_unsequenced_policy>
+    void remove_if(ExecutionPolicy execution_policy, InputAndOutput& input_and_output, AcceptFunction function)
+    {
+        input_and_output.erase(
+            std::remove_if(
+                execution_policy,
+                input_and_output.begin(),
+                input_and_output.end(),
+                function
+            ),
+            input_and_output.end()
+        );
+    }
+#endif // HAS_EXECUTION_POLICY
 
     template <typename InputAndOutput, typename ToValue>
     void sort_ascending(InputAndOutput& input_and_output, ToValue to_value)
