@@ -11,21 +11,21 @@ namespace tuc
         void maybe_parallelize_for_loop(Function function, int loops, bool parallelize)
         {
             if (parallelize) {
-                std::unique_ptr<std::string> error;
+                std::exception_ptr error = nullptr;
 #pragma omp parallel for
                 for (int i = 0; i < loops; ++i) {
                     try {
                         function(i);
                     }
-                    catch (std::exception& e) {
+                    catch (std::exception&) {
 #pragma omp critical
                         if (!error) {
-                            error = std::make_unique<std::string>(e.what());
+                            error = std::current_exception();
                         }
                     }
                 }
                 if (error) {
-                    throw std::runtime_error(*error);
+                    std::rethrow_exception(error);
                 }
             }
             else {

@@ -3,9 +3,14 @@
 #include <thread>
 
 #ifdef WIN32
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif // WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif // NOMINMAX
 #include <windows.h>
-#endif
+#endif // WIN32
 
 namespace tuc
 {
@@ -39,7 +44,7 @@ namespace tuc
         std::thread t;
     };
 
-    void set_current_thread_to_idle_priority()
+    void inline set_current_thread_to_idle_priority()
     {
 #ifdef WIN32
         SetThreadPriority(GetCurrentThread(), -15);

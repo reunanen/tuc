@@ -8,7 +8,11 @@
 
 namespace tuc
 { 
+#ifdef WIN32
+    namespace fs = std::filesystem;
+#else
     namespace fs = std::experimental::filesystem::v1;
+#endif
 
     inline void remove_empty_directories_recursively(fs::path const& path) {
         for (fs::directory_iterator i(path), end; i != end; ++i) {

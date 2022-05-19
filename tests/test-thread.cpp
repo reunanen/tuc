@@ -98,7 +98,7 @@ namespace {
                 }
 #else // WIN32
                 if (actually_set_low_priority) {
-                    EXPECT_LT(low_to_normal_ratio, 0.7);
+                    EXPECT_LT(low_to_normal_ratio, 0.75);
                 }
                 else {
                     EXPECT_LT(low_to_normal_ratio, 1.25);
