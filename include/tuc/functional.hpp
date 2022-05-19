@@ -42,7 +42,7 @@ namespace tuc
             output.begin(),
             function
         );
-        
+
         return output;
     }
 
