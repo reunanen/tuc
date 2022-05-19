@@ -59,11 +59,22 @@ namespace tuc
         return output;
     }
 
-    template <typename InputAndOutput, typename AcceptFunction>
-    void remove_if(InputAndOutput& input_and_output, AcceptFunction function)
+    template <typename InputAndOutput, typename AcceptFunction
+#if HAS_EXECUTION_POLICY
+        , typename ExecutionPolicy = std::execution::parallel_unsequenced_policy
+#endif // HAS_EXECUTION_POLICY
+    >
+    void remove_if(InputAndOutput& input_and_output, AcceptFunction function
+#if HAS_EXECUTION_POLICY
+        , ExecutionPolicy execution_policy = std::execution::par_unseq
+#endif // HAS_EXECUTION_POLICY
+    )
     {
         input_and_output.erase(
             std::remove_if(
+#if HAS_EXECUTION_POLICY
+                execution_policy,
+#endif // HAS_EXECUTION_POLICY
                 input_and_output.begin(),
                 input_and_output.end(),
                 function
