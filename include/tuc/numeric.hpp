@@ -158,7 +158,17 @@ namespace tuc
         if (p == 0) {
             return tuc::geometric_mean(begin, end);
         }
-        p = std::clamp(p, -(std::numeric_limits<P>::max)(), (std::numeric_limits<P>::max)()); // allow -inf and +inf as input
+        { // allow -inf and +inf as input
+            constexpr P min_value = -(std::numeric_limits<P>::max)();
+            constexpr P max_value = +(std::numeric_limits<P>::max)();
+            static_assert(min_value < max_value, "`min_value` should be lower than `max_value`");
+            if (p < min_value) {
+                p = min_value;
+            }
+            else if (p > max_value) {
+                p = max_value;
+            }
+        }
         auto const accumulate = [p](T a, T b) {
             return a + pow(b, p);
         };
