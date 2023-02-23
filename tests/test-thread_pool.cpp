@@ -208,4 +208,18 @@ namespace {
         }
     }
 
+    TEST_F(ThreadPoolTest, ChangesThreadPoolSize) {
+        tuc::thread_pool tp;
+        EXPECT_EQ(tp.get_thread_count(), std::thread::hardware_concurrency());
+
+        tp.set_thread_count(1);
+        EXPECT_EQ(tp.get_thread_count(), 1);
+
+        tp.set_thread_count(4);
+        EXPECT_EQ(tp.get_thread_count(), 4);
+
+        tp.set_thread_count(2);
+        EXPECT_EQ(tp.get_thread_count(), 2);
+    }
+
 }  // namespace

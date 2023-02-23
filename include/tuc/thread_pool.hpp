@@ -25,33 +25,42 @@ namespace tuc
             size_t thread_count = std::thread::hardware_concurrency(),
             thread_priority thread_priority = thread_priority::idle_priority
         )
+            : thread_priority(thread_priority)
         {
-            auto function = [this, thread_priority]() {
-                if (thread_priority == thread_priority::idle_priority) {
-                    set_current_thread_to_idle_priority();
-                }
-                std::chrono::hours constexpr one_hour{ 1 };
-                while (!killed) {
-                    std::vector<incoming_task> tasks;
-                    if (incoming_tasks.pop_front(tasks, one_hour)) {
-                        for (auto& task : tasks) {
-                            task.task();
-                        }
-                    }
-                }
-            };
-
-            for (size_t i = 0; i < thread_count; ++i) {
-                threads.push_back(std::thread(function));
-            }
+            set_thread_count(thread_count);
         }
 
         ~thread_pool()
         {
-            killed = true;
+            for (auto& k : killed) {
+                *k = true;
+            }
             incoming_tasks.halt();
             for (auto& thread : threads) {
                 thread.join();
+            }
+        }
+
+        // note: this will block, if threads to be dropped are still executing
+        void set_thread_count(size_t thread_count)
+        {
+            while (threads.size() > thread_count) {
+                *killed.back() = true;
+                threads.back().join();
+                threads.pop_back();
+                killed.pop_back();
+            }
+
+            while (threads.size() < thread_count) {
+                killed.push_back(
+                    std::make_unique<std::atomic<bool>>(false)
+                );
+
+                auto const index = threads.size();
+                auto const function = [this, index]() {
+                    thread_function(index);
+                };
+                threads.emplace_back(function);
             }
         }
 
@@ -172,7 +181,28 @@ namespace tuc
             std::function<void()> task;
         };
 
-        std::atomic<bool> killed = false;
+        void thread_function(size_t index)
+        {
+            if (thread_priority == thread_priority::idle_priority) {
+                set_current_thread_to_idle_priority();
+            }
+            std::chrono::seconds constexpr one_second{ 1 };
+            auto const is_killed = [this, index]() -> bool {
+                auto const* k = killed[index].get();
+                return *k;
+            };
+            while (!is_killed()) {
+                std::vector<incoming_task> tasks;
+                if (incoming_tasks.pop_front(tasks, one_second)) {
+                    for (auto& task : tasks) {
+                        task.task();
+                    }
+                }
+            }
+        };
+
+        thread_priority const thread_priority = thread_priority::idle_priority;
+        std::vector<std::unique_ptr<std::atomic<bool>>> killed;
         shared_queue<std::vector<incoming_task>> incoming_tasks;
         std::deque<std::thread> threads;
     };
