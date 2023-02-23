@@ -9,6 +9,7 @@
 #include <memory>
 #include <sstream>
 #include <functional>
+#include <iostream>
 
 namespace tuc
 {
@@ -44,14 +45,22 @@ namespace tuc
         // note: this will block, if threads to be dropped are still executing
         void set_thread_count(size_t thread_count)
         {
+            std::cout << "set_thread_count(" << thread_count << ") starting, current count = " << threads.size() << std::endl;
+
             while (threads.size() > thread_count) {
+                std::cout << "setting the kill flag" << std::endl;
                 *killed.back() = true;
+                std::cout << "joining thread" << std::endl;
                 threads.back().join();
+                std::cout << "popping thread" << std::endl;
                 threads.pop_back();
+                std::cout << "popping the kill flag" << std::endl;
                 killed.pop_back();
+                std::cout << "done killing thread" << std::endl;
             }
 
             while (threads.size() < thread_count) {
+                std::cout << "creating a kill flag" << std::endl;
                 killed.push_back(
                     std::make_unique<std::atomic<bool>>(false)
                 );
@@ -60,8 +69,12 @@ namespace tuc
                 auto const function = [this, index]() {
                     thread_function(index);
                 };
+                std::cout << "creating a thread" << std::endl;
                 threads.emplace_back(function);
+                std::cout << "done creating a thread" << std::endl;
             }
+
+            std::cout << "set_thread_count(" << thread_count << ") starting..." << std::endl;
         }
 
         template<typename Function, typename... Arguments>
@@ -188,8 +201,11 @@ namespace tuc
             }
             std::chrono::seconds constexpr one_second{ 1 };
             auto const is_killed = [this, index]() -> bool {
+                std::cout << "is_killed starting..." << std::endl;
                 auto const* k = killed[index].get();
-                return *k;
+                bool const r = *k;
+                std::cout << "is_killed done..." << std::endl;
+                return r;
             };
             while (!is_killed()) {
                 std::vector<incoming_task> tasks;
