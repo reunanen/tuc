@@ -23,9 +23,9 @@ namespace tuc
     public:
         thread_pool(
             size_t thread_count = std::thread::hardware_concurrency(),
-            thread_priority thread_priority = thread_priority::idle_priority
+            thread_priority priority = thread_priority::idle_priority
         )
-            : thread_priority(thread_priority)
+            : priority(priority)
         {
             set_thread_count(thread_count);
         }
@@ -183,7 +183,7 @@ namespace tuc
 
         void thread_function(size_t index)
         {
-            if (thread_priority == thread_priority::idle_priority) {
+            if (priority == thread_priority::idle_priority) {
                 set_current_thread_to_idle_priority();
             }
             std::chrono::seconds constexpr one_second{ 1 };
@@ -201,7 +201,7 @@ namespace tuc
             }
         };
 
-        thread_priority const thread_priority = thread_priority::idle_priority;
+        thread_priority const priority = thread_priority::idle_priority;
         std::vector<std::unique_ptr<std::atomic<bool>>> killed;
         shared_queue<std::vector<incoming_task>> incoming_tasks;
         std::deque<std::thread> threads;
