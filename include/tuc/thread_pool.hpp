@@ -69,7 +69,7 @@ namespace tuc
                 auto const function = [this, index]() {
                     thread_function(index);
                 };
-                std::cout << "creating a thread" << std::endl;
+                std::cout << "creating a thread, index = " << index << std::endl;
                 threads.emplace_back(function);
                 std::cout << "done creating a thread" << std::endl;
             }
@@ -201,7 +201,7 @@ namespace tuc
             }
             std::chrono::seconds constexpr one_second{ 1 };
             auto const is_killed = [this, index]() -> bool {
-                std::cout << "is_killed starting..." << std::endl;
+                std::cout << "is_killed starting with index = " << index << "..." << std::endl;
                 auto const* k = killed[index].get();
                 bool const r = *k;
                 std::cout << "is_killed done..." << std::endl;
