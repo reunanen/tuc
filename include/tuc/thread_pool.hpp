@@ -63,18 +63,18 @@ namespace tuc
             }
 
             while (threads.size() < thread_count) {
-                std::cout << "creating a kill flag" << std::endl;
+                auto const index = threads.size();
+                std::cout << "creating kill flag " << index << std::endl;
                 killed.push_back(
                     std::make_unique<std::atomic<bool>>(false)
                 );
 
-                auto const index = threads.size();
                 auto const function = [this, index]() {
                     thread_function(killed[index].get());
                 };
-                std::cout << "creating a thread" << std::endl;
+                std::cout << "creating thread " << index << std::endl;
                 threads.emplace_back(function);
-                std::cout << "done creating a thread" << std::endl;
+                std::cout << "done creating thread " << index << std::endl;
             }
 
             std::cout << "set_thread_count(" << thread_count << ") done!" << std::endl;
