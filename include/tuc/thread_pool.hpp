@@ -77,7 +77,7 @@ namespace tuc
                 std::cout << "done creating a thread" << std::endl;
             }
 
-            std::cout << "set_thread_count(" << thread_count << ") starting..." << std::endl;
+            std::cout << "set_thread_count(" << thread_count << ") done!" << std::endl;
         }
 
         template<typename Function, typename... Arguments>
