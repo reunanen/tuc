@@ -47,9 +47,12 @@ namespace tuc
         {
             std::cout << "set_thread_count(" << thread_count << ") starting, current count = " << threads.size() << std::endl;
 
-            while (threads.size() > thread_count) {
+            for (size_t i = thread_count, end = threads.size(); i < end; ++i) {
                 std::cout << "setting the kill flag" << std::endl;
-                *killed.back() = true;
+                *killed[i] = true;
+            }
+
+            while (threads.size() > thread_count) {
                 std::cout << "joining thread" << std::endl;
                 threads.back().join();
                 std::cout << "popping thread" << std::endl;
@@ -67,9 +70,9 @@ namespace tuc
 
                 auto const index = threads.size();
                 auto const function = [this, index]() {
-                    thread_function(index);
+                    thread_function(killed[index].get());
                 };
-                std::cout << "creating a thread, index = " << index << std::endl;
+                std::cout << "creating a thread" << std::endl;
                 threads.emplace_back(function);
                 std::cout << "done creating a thread" << std::endl;
             }
@@ -194,20 +197,13 @@ namespace tuc
             std::function<void()> task;
         };
 
-        void thread_function(size_t index)
+        void thread_function(std::atomic<bool>* die)
         {
             if (priority == thread_priority::idle_priority) {
                 set_current_thread_to_idle_priority();
             }
             std::chrono::seconds constexpr one_second{ 1 };
-            auto const is_killed = [this, index]() -> bool {
-                std::cout << "is_killed starting with index = " << index << "..." << std::endl;
-                auto const* k = killed[index].get();
-                bool const r = *k;
-                std::cout << "is_killed done..." << std::endl;
-                return r;
-            };
-            while (!is_killed()) {
+            while (!*die) {
                 std::vector<incoming_task> tasks;
                 if (incoming_tasks.pop_front(tasks, one_second)) {
                     for (auto& task : tasks) {
