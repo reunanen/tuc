@@ -68,9 +68,9 @@ namespace tuc
                 killed.push_back(
                     std::make_unique<std::atomic<bool>>(false)
                 );
-
-                auto const function = [this, index]() {
-                    thread_function(killed[index].get());
+                auto* die = killed[index].get();
+                auto const function = [this, die]() {
+                    thread_function(die);
                 };
                 std::cout << "creating thread " << index << std::endl;
                 threads.emplace_back(function);
