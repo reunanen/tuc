@@ -24,7 +24,7 @@ namespace tuc
             : t(function, arguments...)
         {}
 
-        thread(tuc::thread&& thread)
+        thread(tuc::thread&& thread) noexcept
             : t(std::move(thread.t))
         {}
 
@@ -38,7 +38,7 @@ namespace tuc
             }
         }
 
-        thread& operator=(thread&& that) {
+        thread& operator=(thread&& that) noexcept {
             t = std::move(that.t);
             return *this;
         }
