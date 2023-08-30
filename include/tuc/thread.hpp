@@ -16,6 +16,9 @@ namespace tuc
 {
     class thread {
     public:
+        thread()
+        {}
+
         template <typename Function, typename... Arguments>
         thread(Function function, Arguments... arguments)
             : t(function, arguments...)
@@ -38,6 +41,14 @@ namespace tuc
         thread& operator=(thread&& that) {
             t = std::move(that.t);
             return *this;
+        }
+
+        bool joinable() const noexcept {
+            return t.joinable();
+        }
+
+        void join() {
+            t.join();
         }
 
     private:
