@@ -165,6 +165,7 @@
     <ClInclude Include="..\..\include\tuc\string.hpp" />
     <ClInclude Include="..\..\include\tuc\thread.hpp" />
     <ClInclude Include="..\..\include\tuc\thread_pool.hpp" />
+    <ClInclude Include="..\..\include\tuc\throttle.hpp" />
     <ClInclude Include="..\..\include\tuc\to_string.hpp" />
     <ClInclude Include="..\..\include\tuc\to_string_detail.hpp" />
   </ItemGroup>
@@ -194,6 +195,7 @@
     <ClCompile Include="..\test-string.cpp" />
     <ClCompile Include="..\test-thread.cpp" />
     <ClCompile Include="..\test-thread_pool.cpp" />
+    <ClCompile Include="..\test-throttle.cpp" />
     <ClCompile Include="..\test-to_string.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
