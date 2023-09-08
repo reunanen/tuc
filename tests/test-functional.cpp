@@ -226,4 +226,24 @@ namespace {
         }
     }
 
+    TEST_F(FunctionalTest, ActuallyReleasesMemory) {
+        const size_t empty = 0;
+        const size_t nonEmpty = 100;
+
+        std::vector<int> v(nonEmpty);
+
+        EXPECT_EQ(v.size(),     nonEmpty);
+        EXPECT_EQ(v.capacity(), nonEmpty);
+
+        v.clear();
+
+        EXPECT_EQ(v.size(),     empty);
+        EXPECT_EQ(v.capacity(), nonEmpty);
+
+        tuc::release_memory(v);
+
+        EXPECT_EQ(v.size(),     empty);
+        EXPECT_EQ(v.capacity(), empty);
+    }
+
 }  // namespace

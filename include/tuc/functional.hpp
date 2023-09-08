@@ -136,4 +136,11 @@ namespace tuc
         T const& input;
         std::unique_ptr<T> const function_result;
     };
+
+    template <typename Container>
+    void release_memory(Container& container)
+    {
+        Container temp;
+        std::swap(container, temp);
+    }
 }
