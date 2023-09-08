@@ -26,6 +26,10 @@ namespace tuc
 			}
 		}
 
+		void reset() {
+			latest_action = std::chrono::steady_clock::time_point();
+		}
+
 	private:
 		std::chrono::steady_clock::time_point latest_action;
 	};
