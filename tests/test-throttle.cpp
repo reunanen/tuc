@@ -40,4 +40,14 @@ namespace {
         EXPECT_EQ(check_counter, 100);
         EXPECT_EQ(action_counter, 100);
     }
+
+    TEST_F(ThrottleTest, ProvidesSaneDefaultBehavior) {
+        tuc::throttle t;
+        t.record_action();
+        EXPECT_FALSE(t.should_act());
+        std::this_thread::sleep_for(std::chrono::milliseconds(900));
+        EXPECT_FALSE(t.should_act());
+        std::this_thread::sleep_for(std::chrono::milliseconds(1100));
+        EXPECT_TRUE(t.should_act());
+    }
 }  // namespace
