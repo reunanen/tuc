@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <limits>
 #include <functional>
 #include <algorithm>
 #include <iterator>
