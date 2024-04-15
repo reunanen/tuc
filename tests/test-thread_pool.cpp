@@ -173,4 +173,53 @@ namespace {
         EXPECT_TRUE(flags[2]);
     }
 
+    TEST_F(ThreadPoolTest, LaunchesTasksInChunks) {
+        size_t const task_count{ std::thread::hardware_concurrency() * 4 + 3 };
+
+        tuc::thread_pool tp;
+
+        std::vector<size_t> processing_thread_indexes(task_count, std::numeric_limits<size_t>::max());
+
+        auto const task = [&processing_thread_indexes, &tp](size_t task) {
+            processing_thread_indexes[task] = tp.get_thread_index(std::this_thread::get_id());
+            return task;
+        };
+
+        std::vector<std::future<size_t>> results = tp.launch_in_chunks(task, task_count);
+
+        for (size_t i = 0; i < task_count; ++i) {
+            EXPECT_EQ(results[i].get(), i);
+        }
+
+        auto const default_desired_chunk_size = tp.get_default_desired_chunk_size(task_count);
+
+        EXPECT_LT(default_desired_chunk_size, tuc::divide_rounding_up(task_count, tp.get_thread_count()));
+
+        auto const min_default_desired_chunk_size = tp.get_default_desired_chunk_size(task_count, -std::numeric_limits<double>::infinity());
+        auto const max_default_desired_chunk_size = tp.get_default_desired_chunk_size(task_count,  std::numeric_limits<double>::infinity());
+
+        EXPECT_EQ(min_default_desired_chunk_size, static_cast<size_t>(1));
+        EXPECT_EQ(max_default_desired_chunk_size, tuc::divide_rounding_up(task_count, tp.get_thread_count()));
+
+        for (size_t i = 0; i < task_count; ++i) {
+            auto const reference = (i / default_desired_chunk_size) * default_desired_chunk_size;
+            EXPECT_EQ(processing_thread_indexes[i], processing_thread_indexes[reference]);
+            EXPECT_LT(processing_thread_indexes[i], std::numeric_limits<size_t>::max());
+        }
+    }
+
+    TEST_F(ThreadPoolTest, ChangesThreadPoolSize) {
+        tuc::thread_pool tp;
+        EXPECT_EQ(tp.get_thread_count(), std::thread::hardware_concurrency());
+
+        tp.set_thread_count(1u);
+        EXPECT_EQ(tp.get_thread_count(), 1u);
+
+        tp.set_thread_count(4u);
+        EXPECT_EQ(tp.get_thread_count(), 4u);
+
+        tp.set_thread_count(2u);
+        EXPECT_EQ(tp.get_thread_count(), 2u);
+    }
+
 }  // namespace

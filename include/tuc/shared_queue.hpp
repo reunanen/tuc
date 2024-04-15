@@ -26,6 +26,15 @@ namespace tuc
             condition_variable.notify_one();
         }
 
+        void push_back(T&& value) {
+            {
+                std::lock_guard<std::mutex> lock(mutex);
+                values.push_back(std::move(value));
+                ready = true;
+            }
+            condition_variable.notify_one();
+        }
+
         bool pop_front(T& value) {
             // No waiting.
             std::lock_guard<std::mutex> lock(mutex);
@@ -74,7 +83,7 @@ namespace tuc
 
         bool pop_front_when_already_locked(T& value) {
             if (!values.empty()) {
-                value = this->values.front();
+                std::swap(value, this->values.front());
                 this->values.pop_front();
                 ready = false;
                 return true;

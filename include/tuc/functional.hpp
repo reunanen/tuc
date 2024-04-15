@@ -2,7 +2,10 @@
 
 #include <vector>
 #include <memory>
+#include <limits>
 #include <functional>
+#include <algorithm>
+#include <iterator>
 
 #if defined(__GNUC__) && __GNUC__ < 11
 #define HAS_EXECUTION_POLICY 0
@@ -45,9 +48,9 @@ namespace tuc
     }
 
     template <typename Output, typename Input, typename AcceptFunction>
-    Output filter(Input const& input, AcceptFunction function, size_t expected_size = std::numeric_limits<size_t>::max())
+    Output filter(Input const& input, AcceptFunction function, size_t expected_size = (std::numeric_limits<size_t>::max)())
     {
-        if (expected_size == std::numeric_limits<size_t>::max()) {
+        if (expected_size == (std::numeric_limits<size_t>::max)()) {
             expected_size = input.size();
         }
         Output output;
@@ -162,4 +165,11 @@ namespace tuc
         T const& input;
         std::unique_ptr<T> const function_result;
     };
+
+    template <typename Container>
+    void release_memory(Container& container)
+    {
+        Container temp;
+        std::swap(container, temp);
+    }
 }

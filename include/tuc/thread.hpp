@@ -3,20 +3,28 @@
 #include <thread>
 
 #ifdef WIN32
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif // WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif // NOMINMAX
 #include <windows.h>
-#endif
+#endif // WIN32
 
 namespace tuc
 {
     class thread {
     public:
+        thread()
+        {}
+
         template <typename Function, typename... Arguments>
         thread(Function function, Arguments... arguments)
             : t(function, arguments...)
         {}
 
-        thread(tuc::thread&& thread)
+        thread(tuc::thread&& thread) noexcept
             : t(std::move(thread.t))
         {}
 
@@ -30,16 +38,24 @@ namespace tuc
             }
         }
 
-        thread& operator=(thread&& that) {
+        thread& operator=(thread&& that) noexcept {
             t = std::move(that.t);
             return *this;
+        }
+
+        bool joinable() const noexcept {
+            return t.joinable();
+        }
+
+        void join() {
+            t.join();
         }
 
     private:
         std::thread t;
     };
 
-    void set_current_thread_to_idle_priority()
+    void inline set_current_thread_to_idle_priority()
     {
 #ifdef WIN32
         SetThreadPriority(GetCurrentThread(), -15);
