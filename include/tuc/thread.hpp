@@ -57,12 +57,18 @@ namespace tuc
 
     void inline set_current_thread_to_idle_priority()
     {
-#ifdef WIN32
+#if defined(WIN32)
         SetThreadPriority(GetCurrentThread(), -15);
-#else // WIN32
+#elif defined(__APPLE__)
+        struct sched_param param = {};
+        int policy = 0;
+        pthread_getschedparam(pthread_self(), &policy, &param);
+        param.sched_priority = 0;
+        pthread_setschedparam(pthread_self(), policy, &param);
+#else
         struct sched_param param = {};
         param.sched_priority = 0;
         pthread_setschedparam(pthread_self(), SCHED_IDLE, &param);
-#endif // WIN32
+#endif
     }
 }
