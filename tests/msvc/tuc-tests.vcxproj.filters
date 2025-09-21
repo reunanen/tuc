@@ -51,6 +51,9 @@
     <ClInclude Include="..\..\include\tuc\thread.hpp">
       <Filter>tuc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\tuc\throttle.hpp">
+      <Filter>tuc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test-functional.cpp">
@@ -87,6 +90,9 @@
       <Filter>tests</Filter>
     </ClCompile>
     <ClCompile Include="..\test-thread.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test-throttle.cpp">
       <Filter>tests</Filter>
     </ClCompile>
   </ItemGroup>
