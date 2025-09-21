@@ -10,6 +10,11 @@ jobs:
           name: "Update submodule"
           command: git submodule update --init
       - run:
+          name: "Install TBB"
+          command: |
+            sudo apt-get update -y
+            sudo apt-get install -y libtbb-dev
+      - run:
           name: "Build"
           command: |
             mkdir build

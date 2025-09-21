@@ -6,6 +6,16 @@
 #include <functional>
 #include <algorithm>
 #include <iterator>
+
+#if defined(__GNUC__) && __GNUC__ < 11
+#define TUC_HAS_EXECUTION_POLICY 0
+#elif __cplusplus >= 201703L || (defined (_MSC_VER) && _HAS_CXX17)
+#define TUC_HAS_EXECUTION_POLICY 1
+#include <execution>
+#else // C++17
+#define TUC_HAS_EXECUTION_POLICY 0
+#endif // C++17
+
 #include "functional_detail.hpp"
 
 namespace tuc
@@ -18,6 +28,24 @@ namespace tuc
         std::transform(input.begin(), input.end(), std::back_inserter(output), function);
         return output;
     }
+
+#if TUC_HAS_EXECUTION_POLICY
+    template <typename Output, typename Input, typename MapFunction, typename ExecutionPolicy = std::execution::parallel_unsequenced_policy>
+    Output map(ExecutionPolicy execution_policy, Input const& input, MapFunction function)
+    {
+        Output output(input.size());
+
+        std::transform(
+            execution_policy,
+            input.begin(),
+            input.end(),
+            output.begin(),
+            function
+        );
+
+        return output;
+    }
+#endif // TUC_HAS_EXECUTION_POLICY
 
     template <typename Output, typename Input, typename AcceptFunction>
     Output filter(Input const& input, AcceptFunction function, size_t expected_size = (std::numeric_limits<size_t>::max)())
@@ -43,6 +71,22 @@ namespace tuc
             input_and_output.end()
         );
     }
+
+#if TUC_HAS_EXECUTION_POLICY
+    template <typename InputAndOutput, typename AcceptFunction, typename ExecutionPolicy = std::execution::parallel_unsequenced_policy>
+    void remove_if(ExecutionPolicy execution_policy, InputAndOutput& input_and_output, AcceptFunction function)
+    {
+        input_and_output.erase(
+            std::remove_if(
+                execution_policy,
+                input_and_output.begin(),
+                input_and_output.end(),
+                function
+            ),
+            input_and_output.end()
+        );
+    }
+#endif // TUC_HAS_EXECUTION_POLICY
 
     template <typename InputAndOutput, typename ToValue>
     void sort_ascending(InputAndOutput& input_and_output, ToValue to_value)
