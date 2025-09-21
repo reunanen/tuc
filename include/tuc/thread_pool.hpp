@@ -113,9 +113,7 @@ namespace tuc
         {
             std::vector<std::future<decltype(function(arguments.front()))>> futures(arguments.size());
 
-            size_t const chunk_size = desired_chunk_size == 0
-                ? get_default_desired_chunk_size(arguments.size())
-                : desired_chunk_size;
+            size_t const chunk_size = get_chunk_size(arguments.size(), desired_chunk_size);
 
             std::vector<incoming_task> current_chunk;
             current_chunk.reserve(chunk_size);
@@ -150,6 +148,27 @@ namespace tuc
             std::vector<size_t> arguments(count);
             std::iota(arguments.begin(), arguments.end(), 0);
             return launch_in_chunks(function, arguments, desired_chunk_size);
+        }
+
+        // If constructing a future for each task separately sounds like it may be a bit too much, then the following
+        // two functions can be used to get a single future for each _chunk_ (and not each task, as above).
+
+        // 1) explicitly pass separate arguments for each task
+        template<typename Function, typename... Arguments>
+        auto launch_in_chunks_returning_single_future_for_each_chunk(Function function, std::vector<Arguments...> const& arguments, size_t desired_chunk_size = 0)
+        {
+            auto const process_task = [function, &arguments](size_t i) {
+                return function(arguments[i]);
+            };
+
+            return launch_in_chunks_returning_single_future_for_each_chunk_impl(process_task, arguments.size(), desired_chunk_size);
+        }
+
+        // 1) just pass a `size_t` index for each task
+        template<typename Function>
+        auto launch_in_chunks_returning_single_future_for_each_chunk(Function function, size_t task_count, size_t desired_chunk_size = 0)
+        {
+            return launch_in_chunks_returning_single_future_for_each_chunk_impl(function, task_count, desired_chunk_size);
         }
 
         size_t get_thread_index(std::thread::id const& thread_id) const
@@ -199,6 +218,65 @@ namespace tuc
                 }
             }
         };
+
+        size_t get_chunk_size(size_t task_count, size_t desired_chunk_size) const
+        {
+            if (desired_chunk_size != 0) {
+                return desired_chunk_size;
+            }
+            return get_default_desired_chunk_size(task_count);
+        }
+
+        template<typename Function>
+        auto launch_in_chunks_returning_single_future_for_each_chunk_impl(Function function, size_t task_count, size_t desired_chunk_size)
+        {
+            size_t const chunk_size = get_chunk_size(task_count, desired_chunk_size);
+            size_t const chunk_count = tuc::divide_rounding_up(task_count, chunk_size);
+
+            assert(chunk_size * chunk_count >= task_count);
+            assert(chunk_size * chunk_count < task_count + chunk_size);
+            assert(chunk_size * chunk_count < task_count + chunk_count);
+
+            struct chunk
+            {
+                size_t begin = 0;
+                size_t end = 0;
+            };
+
+            auto const process_chunk = [function](chunk c) {
+                using FunctionReturnType = decltype(function(static_cast<size_t>(0)));
+                if constexpr (std::is_void<FunctionReturnType>::value) {
+                    for (size_t i = c.begin; i < c.end; ++i) {
+                        function(i);
+                    }
+                }
+                else {
+                    auto const chunk_size = c.end - c.begin;
+                    std::vector<FunctionReturnType> results(chunk_size);
+                    for (size_t i = c.begin, j = 0; i < c.end; ++i, ++j) {
+                        results[j] = function(i);
+                    }
+                    return results;
+                }
+            };
+
+            auto const get_chunks = [](size_t task_count, size_t chunk_count) {
+                std::vector<chunk> chunks(chunk_count);
+
+                auto const get_chunk_start_index = [=](size_t chunk_index) {
+                    return tuc::divide_rounding_to_closest(chunk_index * task_count, chunk_count);
+                };
+
+                for (size_t i = 0; i < chunk_count; ++i) {
+                    chunks[i].begin = get_chunk_start_index(i);
+                    chunks[i].end = get_chunk_start_index(i + 1);
+                }
+
+                return chunks;
+            };
+
+            return launch_in_chunks(process_chunk, get_chunks(task_count, chunk_count), 1);
+        }
 
         thread_priority const priority = thread_priority::idle_priority;
         std::vector<std::unique_ptr<std::atomic<bool>>> killed;
