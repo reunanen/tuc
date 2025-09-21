@@ -206,7 +206,7 @@ namespace {
 
         auto const timesTwo = [&evaluations](Noncopyable const& noncopyable) {
             ++evaluations;
-            return std::move(Noncopyable(noncopyable.get_value() * 2));
+            return Noncopyable(noncopyable.get_value() * 2);
         };
 
         Noncopyable const one(1);
