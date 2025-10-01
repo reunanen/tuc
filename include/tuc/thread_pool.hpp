@@ -234,8 +234,8 @@ namespace tuc
             size_t const chunk_count = tuc::divide_rounding_up(task_count, chunk_size);
 
             assert(chunk_size * chunk_count >= task_count);
-            assert(chunk_size * chunk_count < task_count + chunk_size);
-            assert(chunk_size * chunk_count < task_count + chunk_count);
+            assert(task_count == 0 || chunk_size * chunk_count < task_count + chunk_size);
+            assert(task_count == 0 || chunk_size * chunk_count < task_count + chunk_count);
 
             struct chunk
             {
