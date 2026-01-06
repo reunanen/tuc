@@ -95,7 +95,7 @@ namespace tuc
     }
 
     template <typename InputAndOutput, typename ToValue>
-    InputAndOutput sort_ascending(InputAndOutput const& input, ToValue to_value)
+    [[nodiscard]] InputAndOutput sort_ascending(InputAndOutput const& input, ToValue to_value)
     {
         auto output = input;
 
@@ -111,7 +111,7 @@ namespace tuc
     }
 
     template <typename InputAndOutput, typename ToValue>
-    InputAndOutput sort_descending(InputAndOutput const& input, ToValue to_value)
+    [[nodiscard]] InputAndOutput sort_descending(InputAndOutput const& input, ToValue to_value)
     {
         auto output = input;
 
