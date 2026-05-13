@@ -1,7 +1,7 @@
 #pragma once
 
 #include "shared_queue.hpp"
-#include "thread.hpp" // set_current_thread_to_idle_priority()
+#include "thread.hpp" // set_current_thread_to_low/idle_priority()
 #include "numeric.hpp"
 #include <atomic>
 #include <array>
@@ -14,7 +14,8 @@ namespace tuc
 {
     enum struct thread_priority
     {
-        idle_priority = -1,
+        idle_priority = -2,
+        low_priority = -1,
         normal_priority = 0
     };
 
@@ -23,7 +24,7 @@ namespace tuc
     public:
         thread_pool(
             size_t thread_count = std::thread::hardware_concurrency(),
-            thread_priority priority = thread_priority::idle_priority
+            thread_priority priority = thread_priority::low_priority
         )
             : priority(priority)
         {
@@ -205,8 +206,17 @@ namespace tuc
 
         void thread_function(std::atomic<bool> const* die)
         {
-            if (priority == thread_priority::idle_priority) {
+            switch (priority) {
+            case thread_priority::idle_priority:
                 set_current_thread_to_idle_priority();
+                break;
+            case thread_priority::low_priority:
+                set_current_thread_to_low_priority();
+                break;
+            case thread_priority::normal_priority:
+                break; // already at normal priority
+            default:
+                throw std::runtime_error("Unexpected thread priority value: " + std::to_string(static_cast<int>(priority)));
             }
             std::chrono::seconds constexpr one_second{ 1 };
             while (!*die) { // todo: use a proper condition variable or so

@@ -22,17 +22,17 @@ namespace {
     TEST_F(ThreadTest, SetsThreadPriority) {
         unsigned int const hardware_concurrency = std::thread::hardware_concurrency();
 
-        std::array<double, 2> low_to_normal_ratios = {
+        std::array<double, 2> idle_priority_to_normal_priority_ratios = {
             std::numeric_limits<double>::quiet_NaN(),
             std::numeric_limits<double>::quiet_NaN()
         };
 
-        for (int actually_set_low_priority = 0; actually_set_low_priority <= 1; ++actually_set_low_priority) {
-            std::vector<std::atomic<uintmax_t>> low_priority_counters(hardware_concurrency);
+        for (int actually_set_idle_priority = 0; actually_set_idle_priority <= 1; ++actually_set_idle_priority) {
+            std::vector<std::atomic<uintmax_t>> idle_priority_counters(hardware_concurrency);
             std::vector<std::atomic<uintmax_t>> normal_priority_counters(hardware_concurrency);
 
             {
-                std::deque<tuc::thread> low_priority_threads;
+                std::deque<tuc::thread> idle_priority_threads;
                 std::deque<tuc::thread> normal_priority_threads;
 
                 std::atomic<bool> done = false;
@@ -50,12 +50,12 @@ namespace {
                 auto const common_start_time = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
 
                 for (unsigned int i = 0; i < hardware_concurrency; ++i) {
-                    low_priority_threads.emplace_back([&](unsigned int i) {
-                        if (actually_set_low_priority) {
+                    idle_priority_threads.emplace_back([&](unsigned int i) {
+                        if (actually_set_idle_priority) {
                             tuc::set_current_thread_to_idle_priority();
                         }
                         std::this_thread::sleep_until(common_start_time);
-                        busy_loop(low_priority_counters[i]);
+                        busy_loop(idle_priority_counters[i]);
                     }, i);
                     normal_priority_threads.emplace_back([&](unsigned int i) {
                         std::this_thread::sleep_until(common_start_time);
@@ -73,11 +73,11 @@ namespace {
                     return std::accumulate(counters.begin(), counters.end(), static_cast<uintmax_t>(0));
                 };
                 auto const normal_priority_total = get_total(normal_priority_counters);
-                auto const low_priority_total = get_total(low_priority_counters);
+                auto const idle_priority_total = get_total(idle_priority_counters);
 
-                auto const low_to_normal_ratio = low_priority_total / static_cast<double>(normal_priority_total);
+                auto const idle_to_normal_ratio = idle_priority_total / static_cast<double>(normal_priority_total);
 
-                low_to_normal_ratios[actually_set_low_priority] = low_to_normal_ratio;
+                idle_priority_to_normal_priority_ratios[actually_set_idle_priority] = idle_to_normal_ratio;
 
                 done = true; // stop the threads
 
@@ -88,21 +88,21 @@ namespace {
                     ; // Difficult to get Appveyor builds to behave predictably :(
                 }
                 else {
-                    if (actually_set_low_priority) {
-                        EXPECT_LT(low_to_normal_ratio, 0.05);
+                    if (actually_set_idle_priority) {
+                        EXPECT_LT(idle_to_normal_ratio, 0.05);
                     }
                     else {
-                        EXPECT_LT(low_to_normal_ratio, 1.5);
-                        EXPECT_GT(low_to_normal_ratio, 0.5);
+                        EXPECT_LT(idle_to_normal_ratio, 1.5);
+                        EXPECT_GT(idle_to_normal_ratio, 0.5);
                     }
                 }
 #else // WIN32
-                if (actually_set_low_priority) {
-                    EXPECT_LT(low_to_normal_ratio, 0.75);
+                if (actually_set_idle_priority) {
+                    EXPECT_LT(idle_to_normal_ratio, 0.75);
                 }
                 else {
-                    EXPECT_LT(low_to_normal_ratio, 1.25);
-                    EXPECT_GT(low_to_normal_ratio, 0.75);
+                    EXPECT_LT(idle_to_normal_ratio, 1.25);
+                    EXPECT_GT(idle_to_normal_ratio, 0.75);
                 }
 #endif // WIN32
             }
@@ -113,10 +113,10 @@ namespace {
             ; // Difficult to get Appveyor builds to behave predictably
         }
         else {
-            EXPECT_GT(low_to_normal_ratios[0], low_to_normal_ratios[1]);
+            EXPECT_GT(idle_priority_to_normal_priority_ratios[0], idle_priority_to_normal_priority_ratios[1]);
         }
 #else // WIN32
-        EXPECT_GT(low_to_normal_ratios[0], low_to_normal_ratios[1]);
+        EXPECT_GT(idle_priority_to_normal_priority_ratios[0], idle_priority_to_normal_priority_ratios[1]);
 #endif // WIN32
     }
 

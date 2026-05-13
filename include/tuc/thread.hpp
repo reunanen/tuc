@@ -10,6 +10,8 @@
 #define NOMINMAX
 #endif // NOMINMAX
 #include <windows.h>
+#else // WIN32
+#include <pthread.h>
 #endif // WIN32
 
 namespace tuc
@@ -55,16 +57,25 @@ namespace tuc
         std::thread t;
     };
 
+    void inline set_current_thread_to_low_priority()
+    {
+#if defined(WIN32)
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+#elif defined(__APPLE__)
+        pthread_set_qos_class_self_np(QOS_CLASS_UTILITY, 0);
+#else
+        struct sched_param param = {};
+        param.sched_priority = 0;
+        pthread_setschedparam(pthread_self(), SCHED_BATCH, &param);
+#endif
+    }
+
     void inline set_current_thread_to_idle_priority()
     {
 #if defined(WIN32)
-        SetThreadPriority(GetCurrentThread(), -15);
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_IDLE);
 #elif defined(__APPLE__)
-        struct sched_param param = {};
-        int policy = 0;
-        pthread_getschedparam(pthread_self(), &policy, &param);
-        param.sched_priority = 0;
-        pthread_setschedparam(pthread_self(), policy, &param);
+        pthread_set_qos_class_self_np(QOS_CLASS_BACKGROUND, 0);
 #else
         struct sched_param param = {};
         param.sched_priority = 0;
