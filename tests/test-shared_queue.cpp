@@ -179,4 +179,33 @@ namespace {
         }
     }
 
+    TEST_F(SharedQueueTest, WakesWaitingConsumerForEachValuePushed) {
+
+        size_t const consumerCount = 4;
+
+        std::atomic<size_t> poppedValueCount{ 0 };
+        std::vector<std::thread> consumers;
+
+        for (size_t i = 0; i < consumerCount; ++i) {
+            consumers.push_back(std::thread([&] {
+                std::string value;
+                if (buffer.pop_front(value, std::chrono::seconds(2))) {
+                    ++poppedValueCount;
+                }
+            }));
+        }
+
+        // Let the consumers start waiting, then push a value for each of them in quick succession
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        for (size_t i = 0; i < consumerCount; ++i) {
+            buffer.push_back("test");
+        }
+
+        for (auto& consumer : consumers) {
+            consumer.join();
+        }
+
+        EXPECT_EQ(poppedValueCount.load(), consumerCount);
+    }
+
 }  // namespace
