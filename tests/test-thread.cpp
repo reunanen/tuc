@@ -13,6 +13,12 @@ namespace {
 
     };
 
+    // Keeps the counters of different threads on different cache lines, so that the threads do not slow each other down
+    struct padded_counter {
+        std::atomic<uintmax_t> value{ 0 };
+        char padding[64 - sizeof(std::atomic<uintmax_t>)];
+    };
+
     TEST_F(ThreadTest, JoinsThreadAutomatically) {
         auto const nop = []() {};
         tuc::thread t1(nop);
@@ -28,8 +34,8 @@ namespace {
         };
 
         for (int actually_set_idle_priority = 0; actually_set_idle_priority <= 1; ++actually_set_idle_priority) {
-            std::vector<std::atomic<uintmax_t>> idle_priority_counters(hardware_concurrency);
-            std::vector<std::atomic<uintmax_t>> normal_priority_counters(hardware_concurrency);
+            std::vector<padded_counter> idle_priority_counters(hardware_concurrency);
+            std::vector<padded_counter> normal_priority_counters(hardware_concurrency);
 
             {
                 std::deque<tuc::thread> idle_priority_threads;
@@ -55,11 +61,11 @@ namespace {
                             tuc::set_current_thread_to_idle_priority();
                         }
                         std::this_thread::sleep_until(common_start_time);
-                        busy_loop(idle_priority_counters[i]);
+                        busy_loop(idle_priority_counters[i].value);
                     }, i);
                     normal_priority_threads.emplace_back([&](unsigned int i) {
                         std::this_thread::sleep_until(common_start_time);
-                        busy_loop(normal_priority_counters[i]);
+                        busy_loop(normal_priority_counters[i].value);
                     }, i);
                 }
 
@@ -70,7 +76,9 @@ namespace {
 #endif // WIN32
 
                 auto const get_total = [](auto const& counters) {
-                    return std::accumulate(counters.begin(), counters.end(), static_cast<uintmax_t>(0));
+                    return std::accumulate(counters.begin(), counters.end(), static_cast<uintmax_t>(0), [](uintmax_t total, padded_counter const& counter) {
+                        return total + counter.value;
+                    });
                 };
                 auto const normal_priority_total = get_total(normal_priority_counters);
                 auto const idle_priority_total = get_total(idle_priority_counters);
