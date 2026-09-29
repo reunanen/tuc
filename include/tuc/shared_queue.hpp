@@ -21,7 +21,6 @@ namespace tuc
             {
                 std::lock_guard<std::mutex> lock(mutex);
                 values.push_back(value);
-                ready = true;
             }
             condition_variable.notify_one();
         }
@@ -30,7 +29,6 @@ namespace tuc
             {
                 std::lock_guard<std::mutex> lock(mutex);
                 values.push_back(std::move(value));
-                ready = true;
             }
             condition_variable.notify_one();
         }
@@ -51,7 +49,7 @@ namespace tuc
 
             // We don't have anything right now, so let's just wait.
             std::unique_lock<std::mutex> lock(mutex);
-            if (!condition_variable.wait_for(lock, max_duration, [this]{ return this->ready; })) {
+            if (!condition_variable.wait_for(lock, max_duration, [this]{ return !this->values.empty() || this->halted; })) {
                 return false;
             }
 
@@ -72,7 +70,7 @@ namespace tuc
         void halt() {
             {
                 std::lock_guard<std::mutex> lock(mutex);
-                ready = true;
+                halted = true;
             }
             condition_variable.notify_all();
         }
@@ -85,7 +83,7 @@ namespace tuc
             if (!values.empty()) {
                 std::swap(value, this->values.front());
                 this->values.pop_front();
-                ready = false;
+                halted = false;
                 return true;
             }
             else {
@@ -97,6 +95,6 @@ namespace tuc
 
 	    mutable std::mutex mutex;
         std::condition_variable condition_variable;
-	    bool ready = false;
+	    bool halted = false;
     };
 }
