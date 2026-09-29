@@ -3,6 +3,11 @@
 #include <memory> // scoped_ptr
 #include <string>
 
+#ifdef _OPENMP
+#include <omp.h>
+#include <algorithm> // std::clamp
+#endif // _OPENMP
+
 namespace tuc
 { 
     namespace openmp
@@ -12,7 +17,11 @@ namespace tuc
         {
             if (parallelize) {
                 std::exception_ptr error = nullptr;
-#pragma omp parallel for
+#ifdef _OPENMP
+                // A thread with no iteration to run would only wait at the barrier
+                int const thread_count = std::clamp(loops, 1, omp_get_max_threads());
+#pragma omp parallel for num_threads(thread_count)
+#endif // _OPENMP
                 for (int i = 0; i < loops; ++i) {
                     try {
                         function(i);

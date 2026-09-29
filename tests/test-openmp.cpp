@@ -2,9 +2,12 @@ struct IUnknown; // Workaround for "combaseapi.h(229): error C2187: syntax error
 
 #include "../include/tuc/openmp.hpp"
 #include "picotest/picotest.h"
+#include <omp.h>
 #include <thread>
 #include <mutex>
 #include <deque>
+#include <vector>
+#include <algorithm> // std::min
 #include <numeric> // std::iota
 
 namespace {
@@ -61,6 +64,19 @@ namespace {
         }
 
         EXPECT_TRUE(caught);
+    }
+
+    TEST_F(OpenMpTest, StartsNoMoreThreadsThanIterations) {
+        int constexpr few_loops = 2;
+
+        std::vector<int> team_sizes(few_loops);
+        tuc::openmp::parallelize_for_loop([&](int i) {
+            team_sizes[i] = omp_get_num_threads();
+        }, few_loops);
+
+        for (int team_size : team_sizes) {
+            EXPECT_EQ(team_size, std::min(few_loops, omp_get_max_threads()));
+        }
     }
 
 }  // namespace
